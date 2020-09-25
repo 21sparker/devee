@@ -25,3 +25,5 @@ yarn-error.log*
 venv
 __pycache__
 IGNORE
+src/AppTest.css
+src/AppTest.js

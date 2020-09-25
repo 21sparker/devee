@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import Card from './components/Card';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export default class App extends Component {
     
@@ -20,9 +22,10 @@ export default class App extends Component {
     }
 
     renderMyData(){
-        fetch('/api/items')
+        fetch('/api/tasks')
             .then((response) => response.json())
             .then((responseJson) => {
+                responseJson["tasks"].forEach(i => i.dueDate = new Date(i.dueDate));
                 console.log(responseJson["items"])
                 this.setState({ data: responseJson["items"] })
             })
@@ -60,17 +63,22 @@ export default class App extends Component {
 
 class KanbanBoard extends Component {
 
+    onDragEnd = result => {
+        // TODO:
+    }
+
     render() {
         const columns = this.props.columns.map((col) =>
             <Column key={col.title} title={col.title} items={col.items} />
         );
 
         return (
-            <div>
-                <ul style={{display: "inline-flex", listStyleType: "none"}}>
+            <DragDropContext onDragEnd={this.onDragEnd}>
+                <div className="kanban-board">
                     {columns}
-                </ul>
-            </div>
+                </div>
+            </DragDropContext>
+
         );
     }
 }
@@ -78,27 +86,39 @@ class KanbanBoard extends Component {
 
 class Column extends Component {
     render() {
-        const cards = this.props.items.map((item) => 
-            <Card key={item.id} item={item} />
+        const cards = this.props.items.map((item, index) => 
+            <Card key={item.id} item={item} index={index} />
         );
 
         return (
-            <li>
-                <h3>{this.props.title}</h3>
-                <ul style={{listStyleType: "none"}}>{cards}</ul>
-            </li>
+            <div className="column">
+                <div className="header">
+                    <h3>{this.props.title}</h3>
+                </div>
+                <Droppable droppableId={this.props.title}>
+                    {provided => (
+                    <TaskList ref={provided.innerRef}
+                    {...provided.droppableProps}>
+                        {cards}
+                        {provided.placeholder}
+                    </TaskList>
+                    )}
+                </Droppable>
+           
+            </div>
         )
     }
 }
 
-class Card extends Component {
+class TaskList extends Component {
     render() {
-        const item = this.props.item;
-
         return (
-            <li>
-                <p><b>{item.title}</b> {item.description}</p>
-            </li>
+            <div className="container">
+                <ul>
+                    {this.props.children}
+                </ul>
+            </div>
         )
     }
 }
+
