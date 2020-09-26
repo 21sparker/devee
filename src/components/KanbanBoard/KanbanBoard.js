@@ -38,7 +38,7 @@ class KanbanBoard extends Component {
     }
 
     render() {
-        const columns = this.state.columnOrder.map((columnId, index) => {
+        const columnsList = this.state.columnOrder.map((columnId, index) => {
             const column = this.state.columns[columnId];
             return (
                 <ColumnWrapper
@@ -56,7 +56,8 @@ class KanbanBoard extends Component {
                         <KanbanStyleBoard
                             {...provided.droppableProps}
                             innerRef={provided.innerRef}>
-
+                            
+                            {columnsList}
                             {provided.placeholder}
                         </KanbanStyleBoard>
                     )}
