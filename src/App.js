@@ -3,21 +3,14 @@ import Card from './components/Card';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export default class App extends Component {
-    
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            data: null,
-            currentGroupMethod: "status"
-        };
+    state = {
+        tasks: {},
+        columns: {},
+        columnOrder: [],
+    };
 
-        this.groupMethods = {
-            "status": ["Not Started", "In Progress", "Complete"]
-        }
-    }
-
-    componentWillMount() {
+    componentDidMount() {
         this.renderMyData();
     }
 
@@ -25,35 +18,40 @@ export default class App extends Component {
         fetch('/api/tasks')
             .then((response) => response.json())
             .then((responseJson) => {
-                responseJson["tasks"].forEach(i => i.dueDate = new Date(i.dueDate));
-                console.log(responseJson["items"])
-                this.setState({ data: responseJson["items"] })
+                const tasks = responseJson["tasks"];
+                Object.entries(tasks).forEach(([key, value]) => {
+                    tasks[key]["dueDate"] = new Date(value["dueDate"]);
+                    tasks[key]["createdDate"] = new Date(value["createdDate"]);
+                })
+                this.setState(responseJson)
+                console.log(this.state);
             })
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    groupData() {
-        const columnTitles = this.groupMethods[this.state.currentGroupMethod];
-
-        const columns = [];
-        columnTitles.forEach((columnTitle) => {
-            const data = this.state.data.filter((item) => item[this.state.currentGroupMethod] === columnTitle);
-
-            columns.push({
-                "title": columnTitle,
-                "items": data
-            })
+    render() {
+        const columns = this.state.columnOrder.map((columnId, index) => {
+            const column = this.state.columns[columnId];
+            return (
+                <InnerColumnList
+                    key={column.id}
+                    column={column}
+                    taskMap={this.state.tasks}
+                    index={index}/>
+            )
         });
 
-        return columns;
-    }
-
-    render() {
         return (
             <div>
-                {this.state.data ? <KanbanBoard columns={this.groupData()} /> : <p>Loading data....</p>}
+                {this.state.data ?
+                    <DragDropContext onDragEnd={this.onDragEnd}>
+                        <KanbanBoard>
+                            {columns}
+                        </KanbanBoard>
+                    </DragDropContext>    
+                : <p>Loading data....</p>}
             </div>
         );
     }

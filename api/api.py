@@ -4,6 +4,12 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+# Different Group By Views
+
+# 'By Status'
+# 'By Due Date'
+# 'By Sprint'
+
 tasks = {
     "task-1": {
         "id": "task-1",
@@ -25,13 +31,20 @@ tasks = {
     }
 }
 
+sprints = {}
+
+
 columns = {
     "column-1": {
         "id": "column-1",
         "title": "To do",
         "taskIds": ["task-1", "task-2"]
     },
-    "column"
+    "column-2": {
+        "id": "column-2",
+        "title": "In Progress",
+        "taskIds": ["task-3"]
+    }
 }
 
 
@@ -82,7 +95,7 @@ def get_all_tasks():
     if request.method == 'POST':
         pass
 
-    return {"tasks": tasks}
+    return {"tasks": tasks, "columns": columns}
 
 
 @app.route('/api/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
