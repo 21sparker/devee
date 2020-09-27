@@ -24,7 +24,7 @@ tasks = {
         "createdDate": datetime.now()
     },
     "task-3": {
-        "id": "task-2",
+        "id": "task-3",
         "description": "Drop a poop",
         "dueDate": datetime.now(),
         "createdDate": datetime.now()
@@ -44,8 +44,15 @@ columns = {
         "id": "column-2",
         "title": "In Progress",
         "taskIds": ["task-3"]
+    },
+    "column-3": {
+        "id": "column-3",
+        "title": "Complete",
+        "taskIds": []
     }
 }
+
+column_order = ["column-1", "column-2", "column-3"]
 
 
 
@@ -95,7 +102,7 @@ def get_all_tasks():
     if request.method == 'POST':
         pass
 
-    return {"tasks": tasks, "columns": columns}
+    return {"tasks": tasks, "columns": columns, "columnOrder": column_order}
 
 
 @app.route('/api/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])

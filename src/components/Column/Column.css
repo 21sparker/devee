@@ -1,0 +1,19 @@
+.container {
+    margin: 8px;
+    background-color: white;
+    border-radius: 2px;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-list {
+    padding: 8px;
+    flex-grow: 1;
+    min-height: 100px; /* In case all columns are empty */
+}
+
+.column-title {
+    margin: 0px 8px;
+    font-weight: 600;
+}

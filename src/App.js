@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
-import KanbanBoard, { ColumnWrapper } from './components/KanbanBoard/KanbanBoard';
+import KanbanBoard from './components/KanbanBoard/KanbanBoard';
 
 
 export default class App extends Component {
 
     render() {
         return (
-            <div class="app-container">
+            <div className="app-container">
                 {/* <Navbar/>
                 <SidePanel/> */}
                 <KanbanBoard/>
@@ -17,23 +16,4 @@ export default class App extends Component {
     }
 }
 
-
-
-
-
-
-
-
-
-class TaskList extends Component {
-    render() {
-        return (
-            <div className="container">
-                <ul>
-                    {this.props.children}
-                </ul>
-            </div>
-        )
-    }
-}
 

@@ -1,7 +1,7 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+/*
 .kanban-board {
     display: flex;
     flex-direction: row;
@@ -18,13 +18,13 @@ body {
 
 .column>.container {
     padding: 10px;
-}
+} */
 
 /* Remove default styling from ul */
-.column>.container>ul {
+/* .column>.container>ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
-}
+} */
 
 

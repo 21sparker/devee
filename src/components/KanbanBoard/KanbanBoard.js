@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import './KanbanBoard.css';
-import { Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { ColumnWrapper } from '../Column/Column';
-
 
 class KanbanBoard extends Component {
 
@@ -26,7 +25,6 @@ class KanbanBoard extends Component {
                     tasks[key]["createdDate"] = new Date(value["createdDate"]);
                 })
                 this.setState(responseJson)
-                console.log(this.state);
             })
             .catch((error) => {
                 console.log(error);
@@ -34,8 +32,85 @@ class KanbanBoard extends Component {
     }
 
     onDragEnd = results => {
-        //TODO
+        const { destination, source, draggableId, type } = results;
+
+        // Dropped outside droppable area
+        if (!destination) {
+            return;
+        }
+
+        // Dropped exactly where it was before
+        if (
+            destination.droppableId === source.droppableId &&
+            destination.index === source.index
+        ) {
+            return;
+        }
+
+        // Column was dragged to new position
+        if (type === 'column'){
+            const newColumnOrder = Array.from(this.state.columnOrder);
+            newColumnOrder.splice(source.index, 1);
+            newColumnOrder.splice(destination.index, 0, draggableId);
+
+            this.setState({columnOrder: newColumnOrder});
+            return;
+        }
+
+        
+        const start = this.state.columns[source.droppableId]
+        const finish = this.state.columns[destination.droppableId]
+
+        // If moving within the same column
+        if (start === finish) {
+            const newTaskIds = Array.from(start.taskIds);
+            newTaskIds.splice(source.index, 1);
+            newTaskIds.splice(destination.index, 0, draggableId);
+
+            const newColumn = {
+                ...start,
+                taskIds: newTaskIds,
+            };
+
+            const newState = {
+                ...this.state,
+                columns: {
+                    ...this.state.columns,
+                    [newColumn.id]: newColumn,
+                },
+            };
+
+            this.setState(newState);
+            return;
+        }
+
+        // Moving card from one column to another
+        const startTaskIds = Array.from(start.taskIds);
+        startTaskIds.splice(source.index, 1);
+        const newStart = {
+            ...start,
+            taskIds: startTaskIds,
+        }
+
+        const finishTaskIds = Array.from(finish.taskIds);
+        finishTaskIds.splice(destination.index, 0, draggableId);
+        const newFinish = {
+            ...finish,
+            taskIds: finishTaskIds,
+        };
+
+        const newState = {
+            ...this.state,
+            columns: {
+                ...this.state.columns,
+                [newStart.id]: newStart,
+                [newFinish.id]: newFinish,
+            }
+        }
+
+        this.setState(newState);
     }
+
 
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
@@ -71,9 +146,11 @@ class KanbanBoard extends Component {
 
 
 function KanbanStyleBoard(props) {
+    const { innerRef, children, ...rest } = props;
+
     return (
-        <div className="kanban-style-board">
-            {props.children}
+        <div className="kanban-style-board" ref={innerRef} {...rest}>
+            {children}
         </div>
     );
 }

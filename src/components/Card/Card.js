@@ -2,41 +2,54 @@ import React, {Component} from 'react';
 import './Card.css';
 import { Draggable } from 'react-beautiful-dnd';
 
+
+function Title(props) {
+    return <div className="card-title">{props.description}</div>
+}
+
 class Card extends Component {
     render() {
-        const item = this.props.item;
         return (
-            <Draggable draggableId={this.props.item.id} index={this.props.index}>
-            {(provided) => (
-                <Container
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}>
-                <p className="title">{item.title}</p>
-                <div className="indicator-row">
-                    {item.dueDate ? <DueDateIndicator day={item.dueDate.getDate()} 
-                    month={item.dueDate.toLocaleString('en-us', { month: 'short' })} /> : null}
-                </div>
-            </Container>)}
+            <Draggable
+                draggableId={this.props.task.id}
+                index={this.props.index}>
+                    {(provided, snapshot) => (
+                        <Container
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            innerRef={provided.innerRef}
+                            isDragging={snapshot.isDragging}>
+                                <Title description={this.props.task.description} />
+                                <div className="indicator-section">
+                                    {this.props.task.dueDate ? <DueDateIndicator date={this.props.task.dueDate} /> : null}
+                                </div>
+                        </Container>
+                    )}
+
             </Draggable>
         )
     }
 }
 
 class Container extends Component {
-    render() { 
+
+
+    render() {
+        const { innerRef, isDragging, children, ...rest } = this.props;
+
         return (
-            <li className="card">
-                {this.props.children}
-            </li>
+            <div className="card" ref={innerRef} {...rest}>
+                {children}
+            </div>
         )
     }
 }
 
+
 function DueDateIndicator(props){
     return (
         <div className="indicator due-date">
-            {props.month} {props.day.toString().padStart(2, "0")}
+            {props.date.toLocaleString('en', { month: 'short'})} {props.date.getDate().toString().padStart(2, "0")}
         </div>
     )
 }
