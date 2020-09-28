@@ -18,27 +18,26 @@ class Card extends Component {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             innerRef={provided.innerRef}
-                            isDragging={snapshot.isDragging}>
+                            isDragging={snapshot.isDragging}
+                            openCardDialog={this.props.openCardDialog}
+                            taskId={this.props.task.id}>
                                 <Title description={this.props.task.description} />
                                 <div className="indicator-section">
                                     {this.props.task.dueDate ? <DueDateIndicator date={this.props.task.dueDate} /> : null}
                                 </div>
                         </Container>
                     )}
-
             </Draggable>
         )
     }
 }
 
 class Container extends Component {
-
-
     render() {
-        const { innerRef, isDragging, children, ...rest } = this.props;
+        const { innerRef, isDragging, children, openCardDialog, taskId, ...rest } = this.props;
 
         return (
-            <div className="card" ref={innerRef} {...rest}>
+            <div className="card" ref={innerRef} {...rest} onClick={(e) => openCardDialog(taskId)}>
                 {children}
             </div>
         )

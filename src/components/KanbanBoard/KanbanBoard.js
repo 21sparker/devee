@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import './KanbanBoard.css';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Dialog, DialogOverlay, DialogContent } from '@reach/dialog';
 import "@reach/dialog/styles.css";
 import { ColumnWrapper } from '../Column/Column';
+import CardDialog from '../CardDialog/CardDialog';
 
 // Dialog Library Documentation
 // https://reach.tech/dialog/#dialog-ondismiss
@@ -14,7 +14,8 @@ class KanbanBoard extends Component {
         tasks: {},
         columns: {},
         columnOrder: [],
-        showDialog: false,
+        showCardDialog: false,
+        taskIdSelected: null,
     };
 
     componentDidMount() {
@@ -117,9 +118,23 @@ class KanbanBoard extends Component {
         this.setState(newState);
     }
 
-    openDialog = () => this.setState({ showDialog: true })
+    openCardDialog = (taskId) => {
+        this.setState({ taskIdSelected: taskId, showCardDialog: true })
+    }
 
-    closeDialog = () => this.setState({ showDialog: false })
+    closeCardDialog = (newTask) => {
+        const newTaskState = {
+            ...this.state,
+            tasks: {
+                ...this.state.tasks,
+                [newTask.id]: newTask
+            },
+            taskIdSelected: null,
+            showCardDialog: false          
+        }
+
+        this.setState(newTaskState);
+    }
 
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
@@ -129,7 +144,8 @@ class KanbanBoard extends Component {
                     key={column.id}
                     column={column}
                     taskMap={this.state.tasks}
-                    index={index}/>
+                    index={index}
+                    openCardDialog={this.openCardDialog}/>
             )
         });
 
@@ -146,11 +162,11 @@ class KanbanBoard extends Component {
                         </KanbanStyleBoard>
                     )}
                 </Droppable>
-                <button onClick={this.openDialog}>Show Dialog</button>
-                <Dialog isOpen={this.state.showDialog} onDismiss={this.closeDialog}>
-                    <p>Okayyyy</p>
-                    <button onClick={this.closeDialog}>Close</button>
-                </Dialog>
+                <CardDialog 
+                    showCardDialog={this.state.showCardDialog} 
+                    closeCardDialog={this.closeCardDialog}
+                    task={this.state.tasks[this.state.taskIdSelected]}
+                    />
             </DragDropContext>
 
         );

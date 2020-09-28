@@ -32,7 +32,7 @@ class CardList extends Component {
 
     render() {
         return this.props.tasks.map((task, index) => 
-            <Card key={task.id} task={task} index={index} />
+            <Card key={task.id} task={task} index={index} openCardDialog={this.props.openCardDialog}/>
         );
     }
 
@@ -59,7 +59,7 @@ export default class Column extends Component {
                                     isDraggingOver={snapshot.isDraggingOver}
                                     innerRef={provided.innerRef}>
                                         
-                                    <CardList tasks={this.props.tasks} />
+                                    <CardList tasks={this.props.tasks} openCardDialog={this.props.openCardDialog}/>
                                     {provided.placeholder}
                                 </CardListWrapper>
                             )}
@@ -82,9 +82,9 @@ export class ColumnWrapper extends Component {
     // }
 
     render() {
-        const { column, taskMap, index } = this.props;
+        const { column, taskMap, index, openCardDialog } = this.props;
         const tasks = column.taskIds.map(taskId => taskMap[taskId]);
-        return <Column key={column.id} column={column} tasks={tasks} index={index}/>;
+        return <Column key={column.id} column={column} tasks={tasks} index={index} openCardDialog={openCardDialog}/>;
     }
 
 }

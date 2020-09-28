@@ -28,7 +28,13 @@ tasks = {
         "description": "Drop a poop",
         "dueDate": datetime.now(),
         "createdDate": datetime.now()
-    }
+    },
+    "task-4": {
+        "id": "task-4",
+        "description": "Drop another poop",
+        "dueDate": None,
+        "createdDate": datetime.now()
+    }    
 }
 
 sprints = {}
@@ -43,7 +49,7 @@ columns = {
     "column-2": {
         "id": "column-2",
         "title": "In Progress",
-        "taskIds": ["task-3"]
+        "taskIds": ["task-3", "task-4"]
     },
     "column-3": {
         "id": "column-3",
