@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import './Column.css';
-
 import Card from '../Card/Card';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 function Container(props) {
     const { innerRef, ...rest } = props;
@@ -14,7 +14,15 @@ function Container(props) {
 function Title(props) {
     const { children, ...rest } = props;
 
-    return <h4 className="column-title" {...rest}>{children}</h4>
+    return <span className="column-title" {...rest}>{children}</span>
+}
+
+function Header(props) {
+    return <div className="column-header">{props.children}</div>
+}
+
+function Icon(props) {
+    return <span className="add-icon"><FontAwesomeIcon icon={faPlus} /></span>
 }
 
 function CardListWrapper(props) {
@@ -48,9 +56,12 @@ export default class Column extends Component {
                         {...provided.draggableProps}
                         innerRef={provided.innerRef}>
                         
-                        <Title {...provided.dragHandleProps}>
-                            {this.props.column.title}
-                        </Title>
+                        <Header>
+                            <Title {...provided.dragHandleProps}>
+                                {this.props.column.title}
+                            </Title>
+                            <Icon />
+                        </Header>
 
                         <Droppable droppableId={this.props.column.id} type="task">
                             {(provided, snapshot) => (

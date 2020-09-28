@@ -13,7 +13,16 @@
     min-height: 100px; /* In case all columns are empty */
 }
 
+.column-header {
+    margin: 0px 10px 0px 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
 .column-title {
-    margin: 0px 8px;
     font-weight: 600;
+}
+
+.add-icon {
+    color: lightgray;
 }
