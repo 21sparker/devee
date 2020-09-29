@@ -32,6 +32,10 @@ function CardListWrapper(props) {
 }
 
 class CardList extends Component {
+
+    state = {
+        editableTask: null,
+    }
     // shouldComponentUpdate(nextProps) {
     //     if (nextProps.tasks === this.props.tasks){
     //         return false;
@@ -40,7 +44,11 @@ class CardList extends Component {
 
     render() {
         return this.props.tasks.map((task, index) => 
-            <Card key={task.id} task={task} index={index} openCardDialog={this.props.openCardDialog}/>
+            <Card 
+                key={task.id} 
+                task={task} 
+                index={index} 
+                openCardDialog={this.props.openCardDialog}/>
         );
     }
 
@@ -48,6 +56,11 @@ class CardList extends Component {
 
 
 export default class Column extends Component {
+
+    addNewTask = () => {
+        
+    }
+
     render() {
         return (
             <Draggable draggableId={this.props.column.id} index={this.props.index}>

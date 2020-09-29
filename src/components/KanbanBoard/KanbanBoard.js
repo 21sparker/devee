@@ -136,6 +136,7 @@ class KanbanBoard extends Component {
         this.setState(newTaskState);
     }
 
+
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
             const column = this.state.columns[columnId];
