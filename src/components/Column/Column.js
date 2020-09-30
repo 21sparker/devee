@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import './Column.css';
 import Card from '../Card/Card';
+import QuickAddCard from '../Card/QuickAddCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
@@ -44,14 +45,25 @@ class CardList extends Component {
     // }
 
     render() {
-        console.log(this.props.tasks)
-        return this.props.tasks.map((task, index) => 
+        console.log("Render CardList");
+        console.log(this.props.tasks);
+        const cards = this.props.tasks.map((task, index) => 
             <Card 
                 key={task.id} 
                 task={task} 
                 index={index} 
                 openCardDialog={this.props.openCardDialog}/>
-        );
+        )
+
+        if (this.props.quickAddCard){
+            cards.push(
+                <QuickAddCard
+                    key="quick-add"
+                    handleAddNewTask={this.props.handleAddNewTask} />
+            )
+        }
+        console.log(cards)
+        return cards;
     }
 
 }
@@ -59,9 +71,24 @@ class CardList extends Component {
 
 export default class Column extends Component {
 
+    state = {
+        quickAddCard: false,
+    }
+
     handleAddTaskClick = () => {
-        const columnId = this.props.column.id;
-        this.props.addEmptyTask(columnId);
+        // const columnId = this.props.column.id;
+        // this.props.addEmptyTask(columnId);
+        this.setState({
+            quickAddCard: true,
+        })
+    }
+
+    handleAddNewTask = (task) => {
+        this.setState({
+            quickAddCard: false,
+        });
+
+        this.props.addTask(task, this.props.column.id);
     }
 
     render() {
@@ -86,7 +113,11 @@ export default class Column extends Component {
                                     isDraggingOver={snapshot.isDraggingOver}
                                     innerRef={provided.innerRef}>
                                         
-                                    <CardList tasks={this.props.tasks} openCardDialog={this.props.openCardDialog}/>
+                                    <CardList 
+                                        tasks={this.props.tasks} 
+                                        openCardDialog={this.props.openCardDialog}
+                                        quickAddCard={this.state.quickAddCard}
+                                        handleAddNewTask={this.handleAddNewTask} />
                                     {provided.placeholder}
                                 </CardListWrapper>
                             )}
@@ -109,7 +140,7 @@ export class ColumnWrapper extends Component {
     // }
 
     render() {
-        const { column, taskMap, index, openCardDialog, addEmptyTask } = this.props;
+        const { column, taskMap, index, openCardDialog, addTask } = this.props;
         const tasks = column.taskIds.map(taskId => taskMap[taskId]);
         return (
             <Column 
@@ -118,7 +149,7 @@ export class ColumnWrapper extends Component {
                 tasks={tasks} 
                 index={index} 
                 openCardDialog={openCardDialog}
-                addEmptyTask={addEmptyTask} />
+                addTask={addTask} />
         )
     }
 

@@ -138,6 +138,7 @@ class KanbanBoard extends Component {
     }
 
     addTask = (task, columnId) => {
+        console.log("Ran add task")
         fetch('/api/tasks', {
             method: 'POST',
             headers: {
@@ -186,7 +187,7 @@ class KanbanBoard extends Component {
                     taskMap={this.state.tasks}
                     index={index}
                     openCardDialog={this.openCardDialog}
-                    addEmptyTask={this.addEmptyTask}/>
+                    addTask={this.addTask}/>
             )
         });
 

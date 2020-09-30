@@ -3,108 +3,19 @@ import './Card.css';
 import { Draggable } from 'react-beautiful-dnd';
 
 
-// function Title(props) {
+function Title(props) {
 
-//     return (
-//         <div className="card-title">
-//             {props.description}
-//         </div>
-//     )
-// }
-
-
-class Title extends Component {
-    state = {
-        description: this.props.description,
-        isEditable: this.props.isEditable,
-    }
-
-    shouldComponentUpdate = (nextProps, nextState) => {
-        if (nextState === this.state &&
-            nextProps === this.props){
-            return false;
-        } else if(nextProps !== this.props){
-            this.setState({
-                description: nextProps.description,
-            });
-        }
-        return true;
-    }
-
-    handleInputChange = event => {
-        const target = event.target;
-        const value = target.innerText;
-        // const name = target.name;
-
-        this.setState({
-            description: value
-        });        
-    }
-
-    saveInputChange = event => {
-        const target = event.target;
-        const value = target.innerText;
-
-        console.log("Saved: " + value);
-    }
-
-    render() {
-        return (
-            <div 
-                className="card-title" 
-                contentEditable={this.state.isEditable}
-                onChange={this.handleInputChange}
-                onBlur={this.saveInputChange}
-                >
-                {this.props.description}
-            </div>
-        )
-    }    
-
+    return (
+        <div className="card-title">
+            {props.description}
+        </div>
+    )
 }
 
-class EditableTitle extends Component {
-    state = {
-        description: null,
-    }
-
-    shouldComponentUpdate = (nextProps, nextState) => {
-        if (nextState === this.state &&
-            nextProps === this.props){
-            return false;
-        } else if(nextProps !== this.props){
-            this.setState({
-                description: nextProps.description,
-            });
-        }
-        return true;
-    }
-
-    handleInputChange = event => {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });        
-    }
-
-    render() {
-        return (
-            <div 
-                className="card-title" 
-                contentEditable="true" 
-                onChange={this.handleInputChange}
-                onBlur={() => {}}>
-                {this.props.description}
-            </div>
-        )
-    }
-}
 
 class Card extends Component {
     render() {
+        console.log(this.props.task)
         return (
             <Draggable
                 draggableId={this.props.task.id}
@@ -116,9 +27,8 @@ class Card extends Component {
                             innerRef={provided.innerRef}
                             isDragging={snapshot.isDragging}
                             openCardDialog={this.props.openCardDialog}
-                            taskId={this.props.task.id}
-                            isEditable={this.props.task.isEditable}>
-                                <Title description={this.props.task.description} isEditable={this.props.task.isEditable}/>
+                            taskId={this.props.task.id}>
+                                <Title description={this.props.task.description}/>
                                 <div className="indicator-section">
                                     {this.props.task.dueDate ? <DueDateIndicator date={this.props.task.dueDate} /> : null}
                                 </div>
@@ -129,7 +39,7 @@ class Card extends Component {
     }
 }
 
-class Container extends Component {
+export class Container extends Component {
     render() {
         const { innerRef, isDragging, children, openCardDialog, taskId, isEditable, ...rest } = this.props;
 

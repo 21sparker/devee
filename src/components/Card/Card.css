@@ -22,14 +22,14 @@
     color: rgb(55, 53, 47, 0.8);
 }
 
-.focus {
-
-}
-
 .indicator-section {
     padding: 0px 8px 10px;
     font-size: 12px;
     color: rgb(55, 53, 47, 0.8);
 
     display: flex;
+}
+
+.card-title[contenteditable] {
+    outline: 0px solid transparent;
 }
