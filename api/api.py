@@ -1,6 +1,8 @@
 import time
 from flask import Flask, request
 from datetime import datetime
+import json
+import sys
 
 app = Flask(__name__)
 
@@ -104,7 +106,7 @@ column_order = ["column-1", "column-2", "column-3"]
 # a separate piece of data is managed by the columns with links to any relevant task id's
 # I think this is probably a better way to do this then to simply add new attributes to the tasks
 
-@app.route('/api/tasks')
+@app.route('/api/tasks', methods=('GET', 'POST'))
 def get_all_tasks():
     """
     Methods:
@@ -112,7 +114,28 @@ def get_all_tasks():
     - POST: Adds new tasks to database.
     """
     if request.method == 'POST':
-        pass
+        data = request.json
+        task = data["task"]
+        columnId = data["columnId"]
+
+        # MOCK ONLY
+        task["createdDate"] = datetime.now()
+        task["id"] = "task-" + str((len(tasks.keys()) + 1))
+
+        if "description" not in task:
+            task["description"] = None
+
+        if "dueDate" not in task:
+            task["dueDate"] = None
+
+        tasks[task["id"]] = task
+        columns[columnId]["taskIds"].append(task["id"])
+
+
+        # TODO: Add to database
+
+        # TODO: Retrive from database
+        return task
 
     return {"tasks": tasks, "columns": columns, "columnOrder": column_order}
 

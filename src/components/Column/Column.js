@@ -22,7 +22,11 @@ function Header(props) {
 }
 
 function Icon(props) {
-    return <span className="add-icon"><FontAwesomeIcon icon={faPlus} /></span>
+    return (
+        <span className="add-icon" onClick={props.handleAddTaskClick}>
+            <FontAwesomeIcon icon={faPlus} />
+        </span>
+    )
 }
 
 function CardListWrapper(props) {
@@ -33,9 +37,6 @@ function CardListWrapper(props) {
 
 class CardList extends Component {
 
-    state = {
-        editableTask: null,
-    }
     // shouldComponentUpdate(nextProps) {
     //     if (nextProps.tasks === this.props.tasks){
     //         return false;
@@ -43,6 +44,7 @@ class CardList extends Component {
     // }
 
     render() {
+        console.log(this.props.tasks)
         return this.props.tasks.map((task, index) => 
             <Card 
                 key={task.id} 
@@ -57,8 +59,9 @@ class CardList extends Component {
 
 export default class Column extends Component {
 
-    addNewTask = () => {
-        
+    handleAddTaskClick = () => {
+        const columnId = this.props.column.id;
+        this.props.addEmptyTask(columnId);
     }
 
     render() {
@@ -73,7 +76,7 @@ export default class Column extends Component {
                             <Title {...provided.dragHandleProps}>
                                 {this.props.column.title}
                             </Title>
-                            <Icon />
+                            <Icon handleAddTaskClick={this.handleAddTaskClick}/>
                         </Header>
 
                         <Droppable droppableId={this.props.column.id} type="task">
@@ -106,9 +109,17 @@ export class ColumnWrapper extends Component {
     // }
 
     render() {
-        const { column, taskMap, index, openCardDialog } = this.props;
+        const { column, taskMap, index, openCardDialog, addEmptyTask } = this.props;
         const tasks = column.taskIds.map(taskId => taskMap[taskId]);
-        return <Column key={column.id} column={column} tasks={tasks} index={index} openCardDialog={openCardDialog}/>;
+        return (
+            <Column 
+                key={column.id} 
+                column={column} 
+                tasks={tasks} 
+                index={index} 
+                openCardDialog={openCardDialog}
+                addEmptyTask={addEmptyTask} />
+        )
     }
 
 }

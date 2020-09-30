@@ -116,11 +116,9 @@ class Card extends Component {
                             innerRef={provided.innerRef}
                             isDragging={snapshot.isDragging}
                             openCardDialog={this.props.openCardDialog}
-                            taskId={this.props.task.id}>
-                                {/* {this.props.isEditable
-                                ? <EditableTitle description={this.props.task.description} />
-                                : <Title description={this.props.task.description} />} */}
-                                <Title description={this.props.task.description} isEditable={true}/>
+                            taskId={this.props.task.id}
+                            isEditable={this.props.task.isEditable}>
+                                <Title description={this.props.task.description} isEditable={this.props.task.isEditable}/>
                                 <div className="indicator-section">
                                     {this.props.task.dueDate ? <DueDateIndicator date={this.props.task.dueDate} /> : null}
                                 </div>
@@ -133,8 +131,15 @@ class Card extends Component {
 
 class Container extends Component {
     render() {
-        const { innerRef, isDragging, children, openCardDialog, taskId, ...rest } = this.props;
+        const { innerRef, isDragging, children, openCardDialog, taskId, isEditable, ...rest } = this.props;
 
+        if (isEditable) {
+            return (
+                <div className="card" ref={innerRef} {...rest}>
+                    {children}
+                </div>
+            )
+        }
         return (
             <div className="card" ref={innerRef} {...rest} onClick={(e) => openCardDialog(taskId)}>
                 {children}

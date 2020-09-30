@@ -30,6 +30,7 @@ class KanbanBoard extends Component {
                 Object.entries(tasks).forEach(([key, value]) => {
                     tasks[key]["dueDate"] = new Date(value["dueDate"]);
                     tasks[key]["createdDate"] = new Date(value["createdDate"]);
+                    tasks[key]["isEditable"] = false;
                 })
                 this.setState(responseJson)
             })
@@ -136,6 +137,44 @@ class KanbanBoard extends Component {
         this.setState(newTaskState);
     }
 
+    addTask = (task, columnId) => {
+        fetch('/api/tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                task: task,
+                columnId: columnId,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success: ', data);
+            
+            this.setState({
+                tasks: {
+                    ...this.state.tasks,
+                    [data.id]: data,
+                },
+                columns: {
+                    ...this.state.columns,
+                    [columnId]: {
+                        ...this.state.columns[columnId],
+                        taskIds: this.state.columns[columnId].taskIds.concat(data.id),
+                    }
+                }
+            })
+        })
+        .catch(error => {
+            console.log('Error: ', error);
+        })
+    }
+
+    addEmptyTask = (columnId) => {
+        this.addTask({}, columnId);
+    }
+
 
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
@@ -146,7 +185,8 @@ class KanbanBoard extends Component {
                     column={column}
                     taskMap={this.state.tasks}
                     index={index}
-                    openCardDialog={this.openCardDialog}/>
+                    openCardDialog={this.openCardDialog}
+                    addEmptyTask={this.addEmptyTask}/>
             )
         });
 
