@@ -45,8 +45,6 @@ class CardList extends Component {
     // }
 
     render() {
-        console.log("Render CardList");
-        console.log(this.props.tasks);
         const cards = this.props.tasks.map((task, index) => 
             <Card 
                 key={task.id} 
@@ -62,7 +60,6 @@ class CardList extends Component {
                     handleAddNewTask={this.props.handleAddNewTask} />
             )
         }
-        console.log(cards)
         return cards;
     }
 

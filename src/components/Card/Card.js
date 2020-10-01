@@ -15,7 +15,6 @@ function Title(props) {
 
 class Card extends Component {
     render() {
-        console.log(this.props.task)
         return (
             <Draggable
                 draggableId={this.props.task.id}

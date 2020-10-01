@@ -1,7 +1,6 @@
 import time
 from flask import Flask, request
 from datetime import datetime
-import json
 import sys
 
 app = Flask(__name__)
@@ -140,9 +139,20 @@ def get_all_tasks():
     return {"tasks": tasks, "columns": columns, "columnOrder": column_order}
 
 
-@app.route('/api/items/<int:item_id>', methods=['GET', 'PUT', 'DELETE'])
-def edit_item(item_id):
+@app.route('/api/tasks/<string:task_id>', methods=('GET', 'PUT', 'DELETE'))
+def edit_item(task_id):
     """
     Get, edit, or delete an item.
     """
-    pass
+    if request.method == 'PUT':
+        data = request.json
+        task = data["task"]
+
+        # TODO: Validate task
+
+        # Add task to database
+        tasks[task["id"]] = task
+
+        return task
+
+    return {}

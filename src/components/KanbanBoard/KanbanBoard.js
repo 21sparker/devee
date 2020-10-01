@@ -22,15 +22,21 @@ class KanbanBoard extends Component {
         this.renderMyData();
     }
 
+    cleanTask = task => {
+        task["dueDate"] = new Date(task["dueDate"]);
+        task["createdDate"] = new Date(task["createdDate"]);
+        task["isEditable"] = false;
+        
+        return task;
+    }
+
     renderMyData(){
         fetch('/api/tasks')
             .then((response) => response.json())
             .then((responseJson) => {
                 const tasks = responseJson["tasks"];
-                Object.entries(tasks).forEach(([key, value]) => {
-                    tasks[key]["dueDate"] = new Date(value["dueDate"]);
-                    tasks[key]["createdDate"] = new Date(value["createdDate"]);
-                    tasks[key]["isEditable"] = false;
+                Object.keys(tasks).forEach(key => {
+                    this.cleanTask(tasks[key])
                 })
                 this.setState(responseJson)
             })
@@ -120,25 +126,64 @@ class KanbanBoard extends Component {
     }
 
     openCardDialog = (taskId) => {
+        console.log(taskId);
         this.setState({ taskIdSelected: taskId, showCardDialog: true })
     }
 
-    closeCardDialog = (newTask) => {
-        const newTaskState = {
-            ...this.state,
-            tasks: {
-                ...this.state.tasks,
-                [newTask.id]: newTask
-            },
-            taskIdSelected: null,
-            showCardDialog: false          
-        }
+    closeCardDialog = (changes) => {
+        const task = this.state.tasks[this.state.taskIdSelected];
 
-        this.setState(newTaskState);
+        // Update task in DB if task was changed
+        if (changes.description !== task.description ||
+            changes.dueDate !== task.dueDate) 
+            {
+            const callback = data => {
+                const newState = {
+                    ...this.state,
+                    taskIdSelected: null,
+                    showCardDialog: false,
+                    tasks: {
+                        ...this.state.tasks,
+                        [data.id]: this.cleanTask(data),
+                    },
+                }
+                this.setState(newState);
+            }
+
+            this.editTask({
+                ...task,
+                ...changes,
+            }, callback)
+        } else {
+            this.setState({
+                taskIdSelected: null,
+                showCardDialog: false
+            });
+        }
     }
 
-    addTask = (task, columnId) => {
-        console.log("Ran add task")
+    editTask = (task, callback) => {
+        const taskId = task.id;
+
+        fetch('api/tasks/' + taskId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ task: task }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Success editing task ", data);
+            callback(data);
+        })
+        .catch(error => {
+            console.log("Error occurred trying to edit task " + taskId);
+            console.log(error)
+        })
+    }
+
+    addTask = (task, columnId, callback) => {
         fetch('/api/tasks', {
             method: 'POST',
             headers: {
@@ -152,7 +197,15 @@ class KanbanBoard extends Component {
         .then(response => response.json())
         .then(data => {
             console.log('Success: ', data);
-            
+            callback(data);
+        })
+        .catch(error => {
+            console.log('Error: ', error);
+        })
+    }
+
+    addNewTask = (task, columnId) => {
+        const callback = data => {
             this.setState({
                 tasks: {
                     ...this.state.tasks,
@@ -166,14 +219,9 @@ class KanbanBoard extends Component {
                     }
                 }
             })
-        })
-        .catch(error => {
-            console.log('Error: ', error);
-        })
-    }
-
-    addEmptyTask = (columnId) => {
-        this.addTask({}, columnId);
+        }
+        console.log(typeof callback)
+        this.addTask({}, columnId, callback);
     }
 
 
@@ -187,7 +235,7 @@ class KanbanBoard extends Component {
                     taskMap={this.state.tasks}
                     index={index}
                     openCardDialog={this.openCardDialog}
-                    addTask={this.addTask}/>
+                    addTask={this.addNewTask}/>
             )
         });
 
