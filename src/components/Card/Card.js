@@ -4,10 +4,17 @@ import { Draggable } from 'react-beautiful-dnd';
 
 
 function Title(props) {
+    let className = "card-title";
+    let description = props.description;
+
+    if (!props.description) {
+        className += " card-untitled";
+        description = "Untitled";
+    }
 
     return (
-        <div className="card-title">
-            {props.description}
+        <div className={className}>
+            {description}
         </div>
     )
 }
