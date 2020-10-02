@@ -38,14 +38,8 @@ function CardListWrapper(props) {
 
 class CardList extends Component {
 
-    // shouldComponentUpdate(nextProps) {
-    //     if (nextProps.tasks === this.props.tasks){
-    //         return false;
-    //     }
-    // }
-
     render() {
-        const cards = this.props.tasks.map((task, index) => 
+        let cards = this.props.tasks.map((task, index) => 
             <Card 
                 key={task.id} 
                 task={task} 
@@ -54,11 +48,10 @@ class CardList extends Component {
         )
 
         if (this.props.quickAddCard){
-            cards.push(
-                <QuickAddCard
-                    key="quick-add"
-                    handleAddNewTask={this.props.handleAddNewTask} />
-            )
+            cards = [(<QuickAddCard
+                key="quick-add"
+                handleAddNewTask={this.props.handleAddNewTask} />
+            )].concat(cards);
         }
         return cards;
     }

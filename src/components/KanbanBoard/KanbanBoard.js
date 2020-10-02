@@ -210,7 +210,6 @@ class KanbanBoard extends Component {
     }
 
     addNewTask = (task, columnId) => {
-        console.log(task);
         const callback = data => {
             console.log(this.state.tasks);
 
@@ -223,7 +222,7 @@ class KanbanBoard extends Component {
                     ...this.state.columns,
                     [columnId]: {
                         ...this.state.columns[columnId],
-                        taskIds: this.state.columns[columnId].taskIds.concat(data.id),
+                        taskIds: [data.id].concat(this.state.columns[columnId].taskIds),
                     }
                 }
             })
