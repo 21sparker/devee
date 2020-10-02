@@ -5,7 +5,7 @@ import { DialogOverlay, DialogContent } from '@reach/dialog';
 class CardDialog extends Component {
     constructor(props) {
         super(props);
-
+        console.log(props)
         this.state = {
             description: props.task.description ? props.task.description : "",
             dueDateString: props.task.dueDate
@@ -13,8 +13,7 @@ class CardDialog extends Component {
                             : "",
             dialogOpen: true,
         };
-        console.log("constructed modal")
-        console.log(this.state)
+
     }
 
     handleInputChange = event => {
