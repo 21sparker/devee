@@ -7,25 +7,15 @@ class CardDialog extends Component {
         super(props);
 
         this.state = {
-            description: null,
-            dueDateString: null,
+            description: props.task.description ? props.task.description : "",
+            dueDateString: props.task.dueDate
+                            ? convertToInputDateString(props.task.dueDate)
+                            : "",
+            dialogOpen: true,
         };
+        console.log("constructed modal")
+        console.log(this.state)
     }
-
-    // shouldComponentUpdate = (nextProps, nextState) => {
-    //     if (nextState === this.state &&
-    //         nextProps === this.props){
-    //         return false;
-    //     } else if(nextProps !== this.props && nextProps.showCardDialog){
-    //         this.setState({
-    //             description: nextProps.task.description,
-    //             dueDateString: nextProps.task.dueDate
-    //                             ? convertToInputDateString(nextProps.task.dueDate)
-    //                             : undefined,
-    //         });
-    //     }
-    //     return true;
-    // }
 
     handleInputChange = event => {
         const target = event.target;
@@ -37,46 +27,27 @@ class CardDialog extends Component {
         });
     }
 
-    closeDialog(task){
+    closeDialog(){
         const changes = {
             description: this.state.description,
             dueDate: new Date(this.state.dueDateString),
         }
 
-        // Reset state when dialog is closed
         this.setState({
-            description: null,
-            dueDateString: null,
+            dialogOpen: false,
         })
 
         this.props.closeCardDialog(changes)
     }
 
     render() {
-        const { showCardDialog, task } = this.props;
-
         return (
-            <DialogOverlay isOpen={showCardDialog} onDismiss={() => this.closeDialog(task)}>
+            <DialogOverlay isOpen={this.state.dialogOpen} onDismiss={() => this.closeDialog()}>
                 <DialogContent aria-labelledby="description">
-                    {task ? (
-                        // <div>
-                        //     <input
-                        //         id="description"
-                        //         name="description"
-                        //         type="text" 
-                        //         value={this.state.description} 
-                        //         onChange={this.handleInputChange}/>
-                        //     <input 
-                        //         name="dueDateString" 
-                        //         type="date" 
-                        //         value={this.state.dueDateString} 
-                        //         onChange={this.handleInputChange}/>
-                        // </div>
-                        <ControlledInput 
-                            description={this.state.description}
-                            dueDateString={this.state.dueDateString} />
-                    )
-                    : null}
+                    <ControlledInput 
+                        description={this.state.description}
+                        dueDateString={this.state.dueDateString}
+                        handleInputChange={this.handleInputChange} />
                 </DialogContent>
             </DialogOverlay>
         )

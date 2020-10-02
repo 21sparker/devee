@@ -16,6 +16,7 @@
 .card-title {
     padding: 8px 10px 10px;
     font-weight: 500;
+    word-wrap: break-word;
 }
 
 .card-untitled {

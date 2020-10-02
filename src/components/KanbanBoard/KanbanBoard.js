@@ -14,8 +14,9 @@ class KanbanBoard extends Component {
         tasks: {},
         columns: {},
         columnOrder: [],
-        showCardDialog: false,
-        taskIdSelected: null,
+        currentDialog: null,
+        cardDialogTask: null,
+        proposedChanges: null,
     };
 
     componentDidMount() {
@@ -126,12 +127,14 @@ class KanbanBoard extends Component {
     }
 
     openCardDialog = (taskId) => {
-        console.log(taskId);
-        this.setState({ taskIdSelected: taskId, showCardDialog: true })
+        this.setState({ 
+            currentDialog: "EDIT_TASK",
+            cardDialogTask: this.state.tasks[taskId],
+        })
     }
 
     closeCardDialog = (changes) => {
-        const task = this.state.tasks[this.state.taskIdSelected];
+        const task = this.state.cardDialogTask;
 
         // Update task in DB if task was changed
         if (changes.description !== task.description ||
@@ -140,8 +143,9 @@ class KanbanBoard extends Component {
             const callback = data => {
                 const newState = {
                     ...this.state,
-                    taskIdSelected: null,
-                    showCardDialog: false,
+                    currentDialog: null,
+                    cardDialogTask: null,
+                    proposedChanges: null,
                     tasks: {
                         ...this.state.tasks,
                         [data.id]: this.cleanTask(data),
@@ -156,8 +160,9 @@ class KanbanBoard extends Component {
             }, callback)
         } else {
             this.setState({
-                taskIdSelected: null,
-                showCardDialog: false
+                currentDialog: null,
+                cardDialogTask: null,
+                proposedChanges: null,
             });
         }
     }
@@ -225,6 +230,7 @@ class KanbanBoard extends Component {
     }
 
 
+
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
             const column = this.state.columns[columnId];
@@ -239,6 +245,19 @@ class KanbanBoard extends Component {
             )
         });
 
+        const dialog = () => {
+            switch(this.state.currentDialog){
+                case "EDIT_TASK":
+                    return (
+                        <CardDialog
+                            closeCardDialog={this.closeCardDialog}
+                            task={this.state.cardDialogTask} />
+                    )
+                default:
+                    return null
+            }
+        }
+
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable droppableId="all-columns" direction="horizontal" type="column">
@@ -252,11 +271,7 @@ class KanbanBoard extends Component {
                         </KanbanStyleBoard>
                     )}
                 </Droppable>
-                <CardDialog 
-                    showCardDialog={this.state.showCardDialog} 
-                    closeCardDialog={this.closeCardDialog}
-                    task={this.state.tasks[this.state.taskIdSelected]}
-                    />
+                {dialog()}
             </DragDropContext>
 
         );
