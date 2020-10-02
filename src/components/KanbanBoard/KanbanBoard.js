@@ -210,11 +210,14 @@ class KanbanBoard extends Component {
     }
 
     addNewTask = (task, columnId) => {
+        console.log(task);
         const callback = data => {
+            console.log(this.state.tasks);
+
             this.setState({
                 tasks: {
                     ...this.state.tasks,
-                    [data.id]: data,
+                    [data.id]: this.cleanTask(data),
                 },
                 columns: {
                     ...this.state.columns,
@@ -225,8 +228,7 @@ class KanbanBoard extends Component {
                 }
             })
         }
-        console.log(typeof callback)
-        this.addTask({}, columnId, callback);
+        this.addTask(task, columnId, callback);
     }
 
 
