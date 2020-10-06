@@ -24,10 +24,10 @@ class KanbanBoard extends Component {
     }
 
     cleanTask = task => {
+        console.log(task)
         task["dueDate"] = task["dueDate"] ? new Date(task["dueDate"]) : null;
         task["createdDate"] = task["createdDate"] ? new Date(task["createdDate"]) : null;
         task["isEditable"] = false;
-        console.log(task)
 
         return task;
     }

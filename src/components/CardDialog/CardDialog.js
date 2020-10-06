@@ -41,8 +41,12 @@ class CardDialog extends Component {
 
     render() {
         return (
-            <DialogOverlay isOpen={this.state.dialogOpen} onDismiss={() => this.closeDialog()}>
-                <DialogContent aria-labelledby="description">
+            <DialogOverlay 
+                isOpen={this.state.dialogOpen}
+                onDismiss={() => this.closeDialog()}>
+                <DialogContent 
+                aria-labelledby="description"
+                style={{ width: "38vw"}}>
                     <ControlledInput 
                         description={this.state.description}
                         dueDateString={this.state.dueDateString}
@@ -59,18 +63,22 @@ class CardDialog extends Component {
 
 function ControlledInput(props) {
     return (
-        <div>
-            <input
-                id="description"
-                name="description"
-                type="text" 
-                value={props.description} 
-                onChange={props.handleInputChange}/>
-            <input 
-                name="dueDateString" 
-                type="date" 
-                value={props.dueDateString} 
-                onChange={props.handleInputChange}/>
+        <div className="card-dialog-content">
+            <div className="card-dialog-header">
+                <input
+                    id="description"
+                    name="description"
+                    type="text" 
+                    value={props.description} 
+                    onChange={props.handleInputChange}/>
+            </div>
+            <div className="card-dialog-body">
+                <input 
+                    name="dueDateString" 
+                    type="date" 
+                    value={props.dueDateString} 
+                    onChange={props.handleInputChange}/>
+            </div>
         </div>
     )
 }

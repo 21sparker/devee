@@ -1,0 +1,16 @@
+.card-dialog-content {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.card-dialog-header {
+    padding-left: 40px;
+    padding-right: 40px;
+}
+.card-dialog-header>input {
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1.2;
+    width: 100%;
+}
