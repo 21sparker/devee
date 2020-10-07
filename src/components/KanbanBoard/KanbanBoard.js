@@ -137,7 +137,8 @@ class KanbanBoard extends Component {
         const task = this.state.cardDialogTask;
         // Update task in DB if task was changed
         if (changes.description !== task.description ||
-            changes.dueDate !== task.dueDate) 
+            (changes.dueDate ? changes.dueDate.getTime() : null)
+            !== (task.dueDate ? task.dueDate.getTime() : null)) 
             {
             const callback = data => {
                 const newState = {
