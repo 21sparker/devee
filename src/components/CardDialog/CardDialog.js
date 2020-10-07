@@ -87,11 +87,18 @@ class DescriptionInput extends Component {
         this.props.handleInputChange(update);
     }
 
+    handleKeyPress = event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    }
+
     render = () => {
         return <ContentEditable
                     innerRef={this.contentEditable}
                     html={this.props.description}
                     onChange={this.handleChange}
+                    onKeyPress={this.handleKeyPress}
                 />
     }
 }
