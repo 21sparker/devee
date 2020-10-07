@@ -99,6 +99,7 @@ class DescriptionInput extends Component {
                     html={this.props.description}
                     onChange={this.handleChange}
                     onKeyPress={this.handleKeyPress}
+                    className="card-dialog-header"
                 />
     }
 }
