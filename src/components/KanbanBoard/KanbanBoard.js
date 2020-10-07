@@ -135,7 +135,6 @@ class KanbanBoard extends Component {
 
     closeCardDialog = (changes) => {
         const task = this.state.cardDialogTask;
-
         // Update task in DB if task was changed
         if (changes.description !== task.description ||
             changes.dueDate !== task.dueDate) 

@@ -24,7 +24,9 @@ class CardDialog extends Component {
     closeDialog(){
         const changes = {
             description: this.state.description,
-            dueDate: new Date(this.state.dueDateString),
+            dueDate: this.state.dueDateString !== ""
+                        ? new Date(this.state.dueDateString)
+                        : null
         }
 
         this.setState({
