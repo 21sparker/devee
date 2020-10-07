@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import './CardDialog.css';
+import ContentEditable from 'react-contenteditable';
 import { DialogOverlay, DialogContent } from '@reach/dialog';
+import { Container } from '../Card/Card';
 
 class CardDialog extends Component {
     constructor(props) {
@@ -13,11 +15,12 @@ class CardDialog extends Component {
             dialogOpen: true,
         };
 
+        this.descriptionRef = React.createRef();
     }
 
-    handleInputChange = event => {
+    handleInputChange = change => {
         this.setState({
-            [event.target.id]: event.target.innerText
+            ...change
         });
     }
 
@@ -25,7 +28,7 @@ class CardDialog extends Component {
         const changes = {
             description: this.state.description,
             dueDate: this.state.dueDateString !== ""
-                        ? new Date(this.state.dueDateString)
+                        ? new Date(this.state.dueDateString.replace("-", "/"))
                         : null
         }
 
@@ -44,10 +47,16 @@ class CardDialog extends Component {
                 <DialogContent 
                 aria-labelledby="description"
                 style={{ width: "38vw"}}>
-                    <ControlledInput 
-                        description={this.state.description}
-                        dueDateString={this.state.dueDateString}
-                        handleInputChange={this.handleInputChange} />
+                    <CardDialogContainer>
+                        <DescriptionInput
+                            description={this.state.description}
+                            handleInputChange={this.handleInputChange}
+                        />
+                        <DueDateInput
+                            dueDateString={this.state.dueDateString}
+                            handleInputChange={this.handleInputChange}
+                        />
+                    </CardDialogContainer>
                 </DialogContent>
             </DialogOverlay>
         )
@@ -55,48 +64,56 @@ class CardDialog extends Component {
     }
 }
 
-// TODO: We need to replace shouldcomponentupdate with the "Fully controlled component" pattern
-// https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-controlled-component
 
-function ControlledInput(props) {
+function CardDialogContainer(props) {
     return (
         <div className="card-dialog-content">
-            <div className="card-dialog-header">
-                {/* <input
-                    id="description"
-                    name="description"
-                    type="text" 
-                    value={props.description} 
-                    onChange={props.handleInputChange}/> */}
-                <div
-                    id="description"
-                    className="card-dialog-header-input"
-                    contentEditable="true"
-                    onInput={(e) => props.handleInputChange(e)}
-                    suppressContentEditableWarning="true"
-                    >
-                    {props.description}
-                </div>
-            </div>
-            <div className="card-dialog-body">
-                <input 
-                    id="dueDateString"
-                    type="date" 
-                    value={props.dueDateString} 
-                    onChange={props.handleInputChange}/>
-                {/* <div
-                    id="dueDateString"
-                    className="card-dialog-duedate-input"
-                    onChange={props.handleInputChange}
-                    contentEditable="true"
-                    >
-                    {props.dueDateString}
-                </div> */}
-            </div>
+            {props.children}
         </div>
     )
 }
 
+
+class DescriptionInput extends Component {
+    constructor(props){
+        super()
+        this.contentEditable = React.createRef();
+    }
+
+    handleChange = event => {
+        const update = {
+            description: event.target.value,
+        }
+        this.props.handleInputChange(update);
+    }
+
+    render = () => {
+        return <ContentEditable
+                    innerRef={this.contentEditable}
+                    html={this.props.description}
+                    onChange={this.handleChange}
+                />
+    }
+}
+
+
+class DueDateInput extends Component {
+    handleChange = event => {
+        const update = {
+            dueDateString: event.target.value,
+        }
+        this.props.handleInputChange(update);
+    }
+
+    render = () => {
+        return <input 
+                    id="dueDateString"
+                    type="date" 
+                    value={this.props.dueDateString} 
+                    onChange={this.handleChange}
+                />
+    }
+}
 
 function convertToInputDateString(dateObj) {
     return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000 ))
