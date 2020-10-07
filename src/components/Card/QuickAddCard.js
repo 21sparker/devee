@@ -70,6 +70,7 @@ class QuickAddCardTitle extends Component {
                 onBlur={this.handleLoseFocus}
                 onKeyPress={this.handleKeyPress}
                 ref={this.titleInput}
+                suppressContentEditableWarning="true"
                 >
                 {this.props.description}
             </div>

@@ -5,7 +5,6 @@ import { DialogOverlay, DialogContent } from '@reach/dialog';
 class CardDialog extends Component {
     constructor(props) {
         super(props);
-        console.log(props)
         this.state = {
             description: props.task.description ? props.task.description : "",
             dueDateString: props.task.dueDate
@@ -17,12 +16,8 @@ class CardDialog extends Component {
     }
 
     handleInputChange = event => {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
         this.setState({
-            [name]: value
+            [event.target.id]: event.target.innerText
         });
     }
 
@@ -65,19 +60,36 @@ function ControlledInput(props) {
     return (
         <div className="card-dialog-content">
             <div className="card-dialog-header">
-                <input
+                {/* <input
                     id="description"
                     name="description"
                     type="text" 
                     value={props.description} 
-                    onChange={props.handleInputChange}/>
+                    onChange={props.handleInputChange}/> */}
+                <div
+                    id="description"
+                    className="card-dialog-header-input"
+                    contentEditable="true"
+                    onInput={(e) => props.handleInputChange(e)}
+                    suppressContentEditableWarning="true"
+                    >
+                    {props.description}
+                </div>
             </div>
             <div className="card-dialog-body">
                 <input 
-                    name="dueDateString" 
+                    id="dueDateString"
                     type="date" 
                     value={props.dueDateString} 
                     onChange={props.handleInputChange}/>
+                {/* <div
+                    id="dueDateString"
+                    className="card-dialog-duedate-input"
+                    onChange={props.handleInputChange}
+                    contentEditable="true"
+                    >
+                    {props.dueDateString}
+                </div> */}
             </div>
         </div>
     )
