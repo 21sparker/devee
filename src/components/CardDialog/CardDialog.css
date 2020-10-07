@@ -8,7 +8,7 @@
     padding-left: 40px;
     padding-right: 40px;
 }
-.card-dialog-header>input {
+.card-dialog-header>div {
     font-weight: 700;
     font-size: 40px;
     line-height: 1.2;
