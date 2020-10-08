@@ -14,8 +14,12 @@ class KanbanBoard extends Component {
         tasks: {},
         columns: {},
         columnOrder: [],
+
         currentDialog: null,
         cardDialogTask: null,
+        cardDialogStatusId: null,
+        cardDialogStatusOptions: null,
+
         proposedChanges: null,
     };
 
@@ -126,21 +130,32 @@ class KanbanBoard extends Component {
         this.setState(newState);
     }
 
-    openCardDialog = (taskId) => {
+    openCardDialog = (taskId, colId) => {
         this.setState({ 
             currentDialog: "EDIT_TASK",
             cardDialogTask: this.state.tasks[taskId],
+            cardDialogStatusId: colId,
+            cardDialogStatusOptions: Object.entries(this.state.columns).map(([id, col]) => 
+                ({ id: id, name: col.title})
+            ),
         })
     }
 
     closeCardDialog = (changes) => {
         const task = this.state.cardDialogTask;
+        const statusId = this.state.cardDialogStatusId;
         // Update task in DB if task was changed
-        if (changes.description !== task.description ||
-            (changes.dueDate ? changes.dueDate.getTime() : null)
-            !== (task.dueDate ? task.dueDate.getTime() : null)) 
-            {
+        const descriptionChanged = changes.description !== task.description;
+        const dueDateChanged = (changes.dueDate ? changes.dueDate.getTime() : null) !== (task.dueDate ? task.dueDate.getTime() : null)
+        const statusChanged = changes.statusId !== statusId;
+        if (descriptionChanged || dueDateChanged || statusChanged) {
             const callback = data => {
+                const dataTask = data.task;
+                const dataPrevStatusId = data.taskRelated.statusId.previous;
+                const dataPrevStatusTaskIds = Array.from(this.state.columns[dataPrevStatusId].taskIds);
+                dataPrevStatusTaskIds.splice(dataPrevStatusTaskIds.indexOf(dataTask.id), 1)
+                const dataNextStatusId = data.taskRelated.statusId.next;
+                const dataNextStatusTaskIds = this.state.columns[dataNextStatusId].taskIds.concat(dataTask.id);
                 const newState = {
                     ...this.state,
                     currentDialog: null,
@@ -148,16 +163,34 @@ class KanbanBoard extends Component {
                     proposedChanges: null,
                     tasks: {
                         ...this.state.tasks,
-                        [data.id]: this.cleanTask(data),
+                        [dataTask.id]: this.cleanTask(dataTask),
                     },
+                    columns: {
+                        ...this.state.columns,
+                        [dataPrevStatusId]: {
+                            ...this.state.columns[dataPrevStatusId],
+                            taskIds: dataPrevStatusTaskIds
+                        },
+                        [dataNextStatusId]: {
+                            ...this.state.columns[dataNextStatusId],
+                            taskIds: dataNextStatusTaskIds
+                        },
+                    }
                 }
                 this.setState(newState);
             }
-
-            this.editTask({
-                ...task,
-                ...changes,
-            }, callback)
+            // const newTaskIds = Array.from(start.taskIds);
+            // newTaskIds.splice(source.index, 1);
+            // newTaskIds.splice(destination.index, 0, draggableId);
+            this.editTask(
+                {
+                    ...task,
+                    description: changes.description,
+                    dueDate: changes.dueDate,
+                },
+                { 
+                    statusId: { previous: statusId, next: changes.statusId }
+                }, callback)
         } else {
             this.setState({
                 currentDialog: null,
@@ -167,15 +200,16 @@ class KanbanBoard extends Component {
         }
     }
 
-    editTask = (task, callback) => {
+    editTask = (task, taskRelated, callback) => {
         const taskId = task.id;
+        const taskRelatedData = taskRelated ? taskRelated : {};
 
         fetch('api/tasks/' + taskId, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ task: task }),
+            body: JSON.stringify({ task: task, taskRelated: taskRelatedData }),
         })
         .then(response => response.json())
         .then(data => {
@@ -251,7 +285,9 @@ class KanbanBoard extends Component {
                     return (
                         <CardDialog
                             closeCardDialog={this.closeCardDialog}
-                            task={this.state.cardDialogTask} />
+                            task={this.state.cardDialogTask}
+                            statusId={this.state.cardDialogStatusId}
+                            statusOptions={this.state.cardDialogStatusOptions} />
                     )
                 default:
                     return null

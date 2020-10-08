@@ -16,7 +16,7 @@ tasks = {
         "id": "task-1",
         "description": "Watch a movie",
         "dueDate": datetime.now(),
-        "createdDate": datetime.now()
+        "createdDate": datetime.now(),
     },
     "task-2": {
         "id": "task-2",
@@ -147,12 +147,23 @@ def edit_item(task_id):
     if request.method == 'PUT':
         data = request.json
         task = data["task"]
+        task_related = data["taskRelated"]
+
+        return_dict = {}
+
+        # Status has changed for task
+        if "statusId" in task_related:
+            statusId = task_related["statusId"]
+            previous_col = columns[statusId["previous"]]
+            next_col = columns[statusId["next"]]
+            previous_col["taskIds"].remove(task["id"])
+            next_col["taskIds"].append(task["id"])
 
         # TODO: Validate task
 
         # Add task to database
         tasks[task["id"]] = task
 
-        return task
+        return data
 
     return {}

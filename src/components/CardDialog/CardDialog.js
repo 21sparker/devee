@@ -12,6 +12,7 @@ class CardDialog extends Component {
             dueDateString: props.task.dueDate
                             ? convertToInputDateString(props.task.dueDate)
                             : "",
+            statusId: props.statusId,
             dialogOpen: true,
         };
 
@@ -29,7 +30,8 @@ class CardDialog extends Component {
             description: this.state.description,
             dueDate: this.state.dueDateString !== ""
                         ? new Date(this.state.dueDateString.replace("-", "/"))
-                        : null
+                        : null,
+            statusId: this.state.statusId,
         }
 
         this.setState({
@@ -40,7 +42,6 @@ class CardDialog extends Component {
     }
 
     render() {
-        console.log(this.props)
         return (
             <DialogOverlay 
                 isOpen={this.state.dialogOpen}
@@ -68,7 +69,9 @@ class CardDialog extends Component {
                         </NameAndInput>
                         <NameAndInput name="Status">
                             <StatusInput
-                                statusOptions={["To Do", "In Progress", "Complete"]}
+                                statusOptions={this.props.statusOptions}
+                                selectedStatusId={this.state.statusId}
+                                handleInputChange={this.handleInputChange}
                             />
                         </NameAndInput>
                     </CardDialogContainer>
@@ -143,17 +146,17 @@ class DueDateInput extends Component {
 class StatusInput extends Component {
     handleChange = event => {
         const update = {
-            status: event.target.value,
+            statusId: event.target.value,
         }
         this.props.handleInputChange(update);
     }
 
     render = () => {
         return (
-            <select id="status">
-                {this.props.statusOptions.map(status => (
-                    <option value={status}>{status}</option>
-                ))}
+            <select value={this.props.selectedStatusId} onChange={this.handleChange}>
+                {this.props.statusOptions.map(status => 
+                    <option key={status.id} value={status.id}>{status.name}</option>
+                )}
             </select>
         )
     }

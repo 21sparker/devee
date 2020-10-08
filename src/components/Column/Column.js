@@ -105,7 +105,7 @@ export default class Column extends Component {
                                         
                                     <CardList 
                                         tasks={this.props.tasks} 
-                                        openCardDialog={this.props.openCardDialog}
+                                        openCardDialog={(taskId) => this.props.openCardDialog(taskId, this.props.column.id)}
                                         quickAddCard={this.state.quickAddCard}
                                         handleAddNewTask={this.handleAddNewTask} />
                                     {provided.placeholder}
