@@ -66,7 +66,11 @@ class CardDialog extends Component {
                                 handleInputChange={this.handleInputChange}
                             />
                         </NameAndInput>
-
+                        <NameAndInput name="Status">
+                            <StatusInput
+                                statusOptions={["To Do", "In Progress", "Complete"]}
+                            />
+                        </NameAndInput>
                     </CardDialogContainer>
                 </DialogContent>
             </DialogOverlay>
@@ -132,6 +136,25 @@ class DueDateInput extends Component {
                     value={this.props.dueDateString} 
                     onChange={this.handleChange}
                 />
+        )
+    }
+}
+
+class StatusInput extends Component {
+    handleChange = event => {
+        const update = {
+            status: event.target.value,
+        }
+        this.props.handleInputChange(update);
+    }
+
+    render = () => {
+        return (
+            <select id="status">
+                {this.props.statusOptions.map(status => (
+                    <option value={status}>{status}</option>
+                ))}
+            </select>
         )
     }
 }
