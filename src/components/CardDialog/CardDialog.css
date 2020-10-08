@@ -3,14 +3,25 @@
     flex-direction: column;
 }
 
-
 .card-dialog-header {
     padding-left: 40px;
     padding-right: 40px;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
 
     font-weight: 700;
     font-size: 40px;
     line-height: 1.2;
-    width: 100%;
+}
+
+.card-dialog-input-row {
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 5px;
+
+    display: flex;
+}
+
+.card-dialog-input-row>span {
+    width: 150px;
+    color: rgba(55, 53, 47, 0.6);
 }

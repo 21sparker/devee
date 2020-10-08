@@ -40,6 +40,7 @@ class CardDialog extends Component {
     }
 
     render() {
+        console.log(this.props)
         return (
             <DialogOverlay 
                 isOpen={this.state.dialogOpen}
@@ -52,10 +53,18 @@ class CardDialog extends Component {
                             description={this.state.description}
                             handleInputChange={this.handleInputChange}
                         />
-                        <DueDateInput
-                            dueDateString={this.state.dueDateString}
-                            handleInputChange={this.handleInputChange}
-                        />
+                        <NameAndInput name="Created Date">
+                            <div>
+                                {convertToInputDateString(this.props.task.createdDate)}
+                            </div>
+                        </NameAndInput>
+                        <NameAndInput name="Due Date">
+                            <DueDateInput
+                                dueDateString={this.state.dueDateString}
+                                handleInputChange={this.handleInputChange}
+                            />
+                        </NameAndInput>
+
                     </CardDialogContainer>
                 </DialogContent>
             </DialogOverlay>
@@ -114,14 +123,26 @@ class DueDateInput extends Component {
     }
 
     render = () => {
-        return <input 
+        return (
+                <input 
                     id="dueDateString"
                     type="date" 
                     value={this.props.dueDateString} 
                     onChange={this.handleChange}
                 />
+        )
     }
 }
+
+function NameAndInput(props){
+    return (
+        <div className="card-dialog-input-row">
+            <span>{props.name}</span>
+            {props.children}
+        </div>
+    )
+}
+
 
 function convertToInputDateString(dateObj) {
     return new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000 ))
