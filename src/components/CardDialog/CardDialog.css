@@ -4,6 +4,7 @@
 }
 
 .card-dialog-header {
+    padding-top: 20px;
     padding-left: 40px;
     padding-right: 40px;
     padding-bottom: 20px;
@@ -16,9 +17,11 @@
 .card-dialog-input-row {
     padding-left: 40px;
     padding-right: 40px;
-    padding-bottom: 5px;
 
     display: flex;
+    font-size: 16px;
+    height: 34px;
+    align-items: center;
 }
 
 .card-dialog-input-row>span {

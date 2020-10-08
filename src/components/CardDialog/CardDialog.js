@@ -55,7 +55,9 @@ class CardDialog extends Component {
                         />
                         <NameAndInput name="Created Date">
                             <div>
-                                {convertToInputDateString(this.props.task.createdDate)}
+                                {this.props.task.createdDate.toLocaleString('en', { month: 'long'}) + " " + 
+                                this.props.task.createdDate.getDate().toString() + ", " + 
+                                this.props.task.createdDate.getFullYear().toString()}
                             </div>
                         </NameAndInput>
                         <NameAndInput name="Due Date">
