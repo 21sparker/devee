@@ -4,6 +4,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import "@reach/dialog/styles.css";
 import { ColumnWrapper } from '../Column/Column';
 import CardDialog from '../CardDialog/CardDialog';
+import { editTask, addTask } from '../../taskApi';
 
 // Dialog Library Documentation
 // https://reach.tech/dialog/#dialog-ondismiss
@@ -192,7 +193,7 @@ class KanbanBoard extends Component {
                 this.setState(newState);
             }
 
-            this.editTask(
+            editTask(
                 {
                     ...task,
                     description: changes.description,
@@ -208,53 +209,6 @@ class KanbanBoard extends Component {
                 proposedChanges: null,
             });
         }
-    }
-
-    editTask = (task, taskRelated, callback) => {
-        const taskId = task.id;
-        const taskRelatedData = taskRelated ? taskRelated : {};
-
-        fetch('api/tasks/' + taskId, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                taskId: taskId,
-                task: task, 
-                taskRelated: taskRelatedData 
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Success editing task ", data);
-            callback(data);
-        })
-        .catch(error => {
-            console.log("Error occurred trying to edit task " + taskId);
-            console.log(error)
-        })
-    }
-
-    addTask = (task, columnId, callback) => {
-        fetch('/api/tasks', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                task: task,
-                columnId: columnId,
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success: ', data);
-            callback(data);
-        })
-        .catch(error => {
-            console.log('Error: ', error);
-        })
     }
 
     addNewTask = (task, columnId) => {
@@ -274,10 +228,8 @@ class KanbanBoard extends Component {
                 }
             })
         }
-        this.addTask(task, columnId, callback);
+        addTask(task, columnId, callback);
     }
-
-
 
     render() {
         const columnsList = this.state.columnOrder.map((columnId, index) => {
