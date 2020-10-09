@@ -36,19 +36,32 @@ class KanbanBoard extends Component {
         return task;
     }
 
-    renderMyData(){
-        fetch('/api/tasks')
-            .then((response) => response.json())
-            .then((responseJson) => {
-                const tasks = responseJson["tasks"];
-                Object.keys(tasks).forEach(key => {
-                    this.cleanTask(tasks[key])
-                })
-                this.setState(responseJson)
+    renderMyData() {
+        Promise.all([
+            fetch('/api/tasks'),
+            fetch('/api/groupings')
+        ]).then((responses) => {
+            // Get a JSON object from each of the reponses
+            return Promise.all(responses.map((response) => response.json()));
+        }).then((data) => {
+            console.log("Initial data loaded successfully: ", data);
+
+
+
+            // Clean up tasks
+            const tasks = data[0]["tasks"];
+            Object.keys(tasks).forEach(key => {
+                this.cleanTask(tasks[key])
             })
-            .catch((error) => {
-                console.log(error);
-            });
+
+            const stateUpdate = {
+                tasks: tasks,
+                columns: data[1]["groupings"]["status"]["columns"],
+                columnOrder: data[1]["groupings"]["status"]["columnOrder"]
+            }
+            this.setState(stateUpdate)
+
+        })
     }
 
     onDragEnd = results => {

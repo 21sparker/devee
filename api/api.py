@@ -48,18 +48,18 @@ sprints = {}
 
 
 columns = {
-    "column-1": {
-        "id": "column-1",
+    "status-1": {
+        "id": "status-1",
         "title": "To do",
         "taskIds": ["task-1", "task-2"]
     },
-    "column-2": {
-        "id": "column-2",
+    "status-2": {
+        "id": "status-2",
         "title": "In Progress",
         "taskIds": ["task-3", "task-4", "task-5"]
     },
-    "column-3": {
-        "id": "column-3",
+    "status-3": {
+        "id": "status-3",
         "title": "Complete",
         "taskIds": []
     }
@@ -137,7 +137,8 @@ def get_all_tasks():
         # TODO: Retrive from database
         return task
 
-    return {"tasks": tasks, "columns": columns, "columnOrder": column_order}
+    # return {"tasks": tasks, "columns": columns, "columnOrder": column_order}
+    return { "tasks": tasks }
 
 
 @app.route('/api/tasks/<string:task_id>', methods=('GET', 'PUT', 'DELETE'))
@@ -187,7 +188,7 @@ def get_all_groupings():
     if request.method == 'POST':
         pass
     
-    return groupings
+    return { "groupings": groupings }
 
 @app.route('/api/groupings/<string:grouping_id>', methods=('GET', 'PUT', 'DELETE'))
 def edit_grouping(grouping_id):
