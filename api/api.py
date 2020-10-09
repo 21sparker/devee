@@ -47,63 +47,64 @@ tasks = {
 sprints = {}
 
 
+# columns = {
+#     "column-1": {
+#         "id": "column-1",
+#         "title": "To do",
+#         "taskIds": ["task-1", "task-2"]
+#     },
+#     "column-2": {
+#         "id": "column-2",
+#         "title": "In Progress",
+#         "taskIds": ["task-3", "task-4", "task-5"]
+#     },
+#     "column-3": {
+#         "id": "column-3",
+#         "title": "Complete",
+#         "taskIds": []
+#     }
+# }
+
+# column_order = ["column-1", "column-2", "column-3"]
+
 columns = {
-    "column-1": {
-        "id": "column-1",
-        "title": "To do",
-        "taskIds": ["task-1", "task-2"]
+    "status" : {
+        "columns": {
+            "status-1": {
+                "id": "status-1",
+                "title": "To do",
+                "taskIds": ["task-1", "task-2"]
+            },
+            "status-2": {
+                "id": "status-2",
+                "title": "In Progress",
+                "taskIds": ["task-3", "task-4", "task-5"]
+            },
+            "status-3": {
+                "id": "status-3",
+                "title": "Complete",
+                "taskIds": []
+            }            
+        },
+        "columnOrder": ["status-1", "status-2", "status-3"]
     },
-    "column-2": {
-        "id": "column-2",
-        "title": "In Progress",
-        "taskIds": ["task-3", "task-4", "task-5"]
-    },
-    "column-3": {
-        "id": "column-3",
-        "title": "Complete",
-        "taskIds": []
+    "bucket" : {
+        "columns": {
+            "bucket-1": {
+                "id": "bucket-1",
+                "title": "Admin",
+                "taskIds": ["task-1", "task-2", "task-3"]
+            },
+            "bucket-2": {
+                "id": "bucket-2",
+                "title": "Project",
+                "taskIds": ["task-4", "task-5"]
+            }
+        },
+        "columnOrder": ["bucket-1", "bucket-2"]
     }
 }
 
-column_order = ["column-1", "column-2", "column-3"]
-
-
-
-# items = [
-#     {
-#         "id": "t1",
-#         "status": "Not Started",
-#         "title": "A task not started",
-#         "dueDate": datetime.now(),
-#         "description": "The description of said task"
-#     },
-#     {
-#         "id": "t2",
-#         "status": "Not Started",
-#         "title": "A task not really  started",
-#         "dueDate": datetime.now(),
-#         "description": "The description of said task"
-#     }
-# ]
-
-# Structure taken from react drag and drop course video 3
-# Use it as an example for structuring your columns data
-# const initialData = {
-#     tasks: {
-#         'task-1': { id: 'task-1', content: 'Take out the garbage' },
-#         ...
-#     },
-#     columns: {
-#         'column-1': {
-#             id: 'column-1',
-#             title: 'To do',
-#             taskIds: ['task-1', 'task-2', 'task-3', 'task-4']
-#         }
-#     }
-# }
-# Notice how instead of adding the different column attributes to the tasks themselves, 
-# a separate piece of data is managed by the columns with links to any relevant task id's
-# I think this is probably a better way to do this then to simply add new attributes to the tasks
 
 @app.route('/api/tasks', methods=('GET', 'POST'))
 def get_all_tasks():
@@ -178,3 +179,11 @@ def edit_item(task_id):
         return return_dict
 
     return {}
+
+
+@app.route('/api/columns/<string:column_id>', methods=('GET', 'PUT', 'DELETE'))
+def edit_item(column_id):
+    """
+    Get, edit, or delete column.
+    """
+    pass
