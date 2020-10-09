@@ -149,13 +149,12 @@ class KanbanBoard extends Component {
         const dueDateChanged = (changes.dueDate ? changes.dueDate.getTime() : null) !== (task.dueDate ? task.dueDate.getTime() : null)
         const statusChanged = changes.statusId !== statusId;
         if (descriptionChanged || dueDateChanged || statusChanged) {
+
+            // Callback to update the state once the api returns a successful task edit
             const callback = data => {
+
+                // Update Card Dialog state variables and update task in state
                 const dataTask = data.task;
-                const dataPrevStatusId = data.taskRelated.statusId.previous;
-                const dataPrevStatusTaskIds = Array.from(this.state.columns[dataPrevStatusId].taskIds);
-                dataPrevStatusTaskIds.splice(dataPrevStatusTaskIds.indexOf(dataTask.id), 1)
-                const dataNextStatusId = data.taskRelated.statusId.next;
-                const dataNextStatusTaskIds = this.state.columns[dataNextStatusId].taskIds.concat(dataTask.id);
                 const newState = {
                     ...this.state,
                     currentDialog: null,
@@ -164,8 +163,21 @@ class KanbanBoard extends Component {
                     tasks: {
                         ...this.state.tasks,
                         [dataTask.id]: this.cleanTask(dataTask),
-                    },
-                    columns: {
+                    }
+                }
+                
+                if (statusChanged) {
+                    // Remove task from previous status column
+                    const dataPrevStatusId = data.taskRelated.statusId.previous;
+                    const dataPrevStatusTaskIds = Array.from(this.state.columns[dataPrevStatusId].taskIds);
+                    dataPrevStatusTaskIds.splice(dataPrevStatusTaskIds.indexOf(dataTask.id), 1)
+                    
+                    // Add task to new status column
+                    const dataNextStatusId = data.taskRelated.statusId.next;
+                    const dataNextStatusTaskIds = this.state.columns[dataNextStatusId].taskIds.concat(dataTask.id);
+                    
+                    // Include changes in new state
+                    newState.columns = {
                         ...this.state.columns,
                         [dataPrevStatusId]: {
                             ...this.state.columns[dataPrevStatusId],
@@ -179,9 +191,7 @@ class KanbanBoard extends Component {
                 }
                 this.setState(newState);
             }
-            // const newTaskIds = Array.from(start.taskIds);
-            // newTaskIds.splice(source.index, 1);
-            // newTaskIds.splice(destination.index, 0, draggableId);
+
             this.editTask(
                 {
                     ...task,
@@ -209,7 +219,11 @@ class KanbanBoard extends Component {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ task: task, taskRelated: taskRelatedData }),
+            body: JSON.stringify({ 
+                taskId: taskId,
+                task: task, 
+                taskRelated: taskRelatedData 
+            }),
         })
         .then(response => response.json())
         .then(data => {

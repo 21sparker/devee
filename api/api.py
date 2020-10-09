@@ -146,24 +146,35 @@ def edit_item(task_id):
     """
     if request.method == 'PUT':
         data = request.json
-        task = data["task"]
-        task_related = data["taskRelated"]
+
+        # Task being edited
+        taskId = data["taskId"]
 
         return_dict = {}
+        return_dict["taskId"] = taskId
 
-        # Status has changed for task
-        if "statusId" in task_related:
-            statusId = task_related["statusId"]
-            previous_col = columns[statusId["previous"]]
-            next_col = columns[statusId["next"]]
-            previous_col["taskIds"].remove(task["id"])
-            next_col["taskIds"].append(task["id"])
+        # Task attributes are being updated
+        if "task" in data:
+            task = data["task"]
+            # "Update database"
+            tasks[taskId] = task
+            return_dict["task"] = task
 
-        # TODO: Validate task
+        # Related task attributes are being updated
+        if "taskRelated" in data:
+            task_related = data["taskRelated"]
+            return_dict["taskRelated"] = {}
 
-        # Add task to database
-        tasks[task["id"]] = task
+            # Status has changed for task
+            if "statusId" in task_related:
+                statusId = task_related["statusId"]
+                previous_col = columns[statusId["previous"]]
+                next_col = columns[statusId["next"]]
+                previous_col["taskIds"].remove(task["id"])
+                next_col["taskIds"].append(task["id"])
 
-        return data
+                return_dict["taskRelated"]["statusId"] = statusId
+
+        return return_dict
 
     return {}
