@@ -47,27 +47,27 @@ tasks = {
 sprints = {}
 
 
-# columns = {
-#     "column-1": {
-#         "id": "column-1",
-#         "title": "To do",
-#         "taskIds": ["task-1", "task-2"]
-#     },
-#     "column-2": {
-#         "id": "column-2",
-#         "title": "In Progress",
-#         "taskIds": ["task-3", "task-4", "task-5"]
-#     },
-#     "column-3": {
-#         "id": "column-3",
-#         "title": "Complete",
-#         "taskIds": []
-#     }
-# }
-
-# column_order = ["column-1", "column-2", "column-3"]
-
 columns = {
+    "column-1": {
+        "id": "column-1",
+        "title": "To do",
+        "taskIds": ["task-1", "task-2"]
+    },
+    "column-2": {
+        "id": "column-2",
+        "title": "In Progress",
+        "taskIds": ["task-3", "task-4", "task-5"]
+    },
+    "column-3": {
+        "id": "column-3",
+        "title": "Complete",
+        "taskIds": []
+    }
+}
+
+column_order = ["column-1", "column-2", "column-3"]
+
+groupings = {
     "status" : {
         "columns": {
             "status-1": {
@@ -148,17 +148,13 @@ def edit_item(task_id):
     if request.method == 'PUT':
         data = request.json
 
-        # Task being edited
-        taskId = data["taskId"]
-
         return_dict = {}
-        return_dict["taskId"] = taskId
 
         # Task attributes are being updated
         if "task" in data:
             task = data["task"]
             # "Update database"
-            tasks[taskId] = task
+            tasks[task_id] = task
             return_dict["task"] = task
 
         # Related task attributes are being updated
@@ -181,9 +177,31 @@ def edit_item(task_id):
     return {}
 
 
-@app.route('/api/columns/<string:column_id>', methods=('GET', 'PUT', 'DELETE'))
-def edit_item(column_id):
+@app.route('/api/groupings', methods=('GET', 'POST'))
+def get_all_groupings():
     """
-    Get, edit, or delete column.
+    Methods:
+    - GET: Gets all the groupings in the database.
+    - POST: Adds a new grouping to database.
     """
-    pass
+    if request.method == 'POST':
+        pass
+    
+    return groupings
+
+@app.route('/api/groupings/<string:grouping_id>', methods=('GET', 'PUT', 'DELETE'))
+def edit_grouping(grouping_id):
+    """
+    Get, edit, or delete grouping.
+    """
+    if request.method == 'PUT':
+        data = request.json
+
+        groupings[grouping_id] = data["grouping"]
+
+        return data["grouping"]
+    
+    return {}
+
+
+

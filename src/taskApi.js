@@ -12,7 +12,6 @@ const editTask = (task, taskRelated, callback) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-            taskId: taskId,
             task: task, 
             taskRelated: taskRelatedData 
         }),
