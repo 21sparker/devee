@@ -4,7 +4,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import "@reach/dialog/styles.css";
 import { ColumnWrapper } from '../Column/Column';
 import CardDialog from '../CardDialog/CardDialog';
-import { editTask, addTask } from '../../taskApi';
+import { editTask, addTask, editGrouping, editColumn } from '../../taskApi';
 
 // Dialog Library Documentation
 // https://reach.tech/dialog/#dialog-ondismiss
@@ -13,8 +13,8 @@ class KanbanBoard extends Component {
 
     state = {
         tasks: {},
-        columns: {},
-        columnOrder: [],
+        groupings: null,
+        currentGrouping: null,
 
         currentDialog: null,
         cardDialogTask: null,
@@ -46,18 +46,17 @@ class KanbanBoard extends Component {
         }).then((data) => {
             console.log("Initial data loaded successfully: ", data);
 
-
-
             // Clean up tasks
             const tasks = data[0]["tasks"];
             Object.keys(tasks).forEach(key => {
                 this.cleanTask(tasks[key])
             })
 
+            const groupings = data[1]["groupings"]
             const stateUpdate = {
                 tasks: tasks,
-                columns: data[1]["groupings"]["status"]["columns"],
-                columnOrder: data[1]["groupings"]["status"]["columnOrder"]
+                groupings: groupings,
+                currentGrouping: "status",
             }
             this.setState(stateUpdate)
 
@@ -66,6 +65,10 @@ class KanbanBoard extends Component {
 
     onDragEnd = results => {
         const { destination, source, draggableId, type } = results;
+
+        const grouping = this.state.groupings[this.state.currentGrouping];
+        const columns = grouping["columns"];
+        const columnOrder = grouping["columnOrder"];
 
         // Dropped outside droppable area
         if (!destination) {
@@ -82,17 +85,28 @@ class KanbanBoard extends Component {
 
         // Column was dragged to new position
         if (type === 'column'){
-            const newColumnOrder = Array.from(this.state.columnOrder);
+            const newColumnOrder = Array.from(columnOrder);
             newColumnOrder.splice(source.index, 1);
             newColumnOrder.splice(destination.index, 0, draggableId);
 
-            this.setState({columnOrder: newColumnOrder});
+            const newGrouping = {
+                ...grouping,
+                columnOrder: newColumnOrder,
+            }
+
+            editGrouping(newGrouping, () => {})
+
+            this.setState({
+                groupings: {
+                    ...this.state.groupings,
+                    [grouping.id]: newGrouping
+                }
+            });
             return;
         }
-
         
-        const start = this.state.columns[source.droppableId]
-        const finish = this.state.columns[destination.droppableId]
+        const start = columns[source.droppableId]
+        const finish = columns[destination.droppableId]
 
         // If moving within the same column
         if (start === finish) {
@@ -104,52 +118,63 @@ class KanbanBoard extends Component {
                 ...start,
                 taskIds: newTaskIds,
             };
+            
+            editColumn(newColumn, grouping.id, () => {})
 
-            const newState = {
-                ...this.state,
-                columns: {
-                    ...this.state.columns,
-                    [newColumn.id]: newColumn,
-                },
-            };
-
-            this.setState(newState);
+            this.setState({
+                groupings: {
+                    ...this.state.groupings,
+                    [grouping.id]: {
+                        ...grouping,
+                        columns: {
+                            ...columns,
+                            [start.id]: newColumn,
+                        }
+                    }
+                }
+            });
             return;
         }
 
         // Moving card from one column to another
         const startTaskIds = Array.from(start.taskIds);
         startTaskIds.splice(source.index, 1);
-        const newStart = {
+        const newStartColumn = {
             ...start,
             taskIds: startTaskIds,
         }
+        editColumn(newStartColumn, grouping.id, () => {})
 
         const finishTaskIds = Array.from(finish.taskIds);
         finishTaskIds.splice(destination.index, 0, draggableId);
-        const newFinish = {
+        const newFinishColumn = {
             ...finish,
             taskIds: finishTaskIds,
         };
+        editColumn(newFinishColumn, grouping.id, () => {})
 
-        const newState = {
-            ...this.state,
-            columns: {
-                ...this.state.columns,
-                [newStart.id]: newStart,
-                [newFinish.id]: newFinish,
+        this.setState({
+            groupings: {
+                ...this.state.groupings,
+                [grouping.id]: {
+                    ...grouping,
+                    columns: {
+                        ...columns,
+                        [start.id]: newStartColumn, 
+                        [finish.id]: newFinishColumn,
+                    }
+                }
             }
-        }
-
-        this.setState(newState);
+        });
     }
 
     openCardDialog = (taskId, colId) => {
+        const columns = this.state.groupings[this.state.currentGrouping]["columns"]
         this.setState({ 
             currentDialog: "EDIT_TASK",
             cardDialogTask: this.state.tasks[taskId],
             cardDialogStatusId: colId,
-            cardDialogStatusOptions: Object.entries(this.state.columns).map(([id, col]) => 
+            cardDialogStatusOptions: Object.entries(columns).map(([id, col]) => 
                 ({ id: id, name: col.title})
             ),
         })
@@ -245,18 +270,25 @@ class KanbanBoard extends Component {
     }
 
     render() {
-        const columnsList = this.state.columnOrder.map((columnId, index) => {
-            const column = this.state.columns[columnId];
-            return (
-                <ColumnWrapper
-                    key={column.id}
-                    column={column}
-                    taskMap={this.state.tasks}
-                    index={index}
-                    openCardDialog={this.openCardDialog}
-                    addTask={this.addNewTask}/>
-            )
-        });
+        
+        let columnsList;
+        if (this.state.groupings) {
+            const currentGroup = this.state.groupings[this.state.currentGrouping];
+            columnsList = currentGroup.columnOrder.map((columnId, index) => {
+                const column = currentGroup.columns[columnId];
+                return (
+                    <ColumnWrapper
+                        key={column.id}
+                        column={column}
+                        taskMap={this.state.tasks}
+                        index={index}
+                        openCardDialog={this.openCardDialog}
+                        addTask={this.addNewTask}/>
+                )
+            });
+        } else {
+            columnsList = null
+        }
 
         const dialog = () => {
             switch(this.state.currentDialog){

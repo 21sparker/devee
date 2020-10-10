@@ -69,6 +69,7 @@ column_order = ["column-1", "column-2", "column-3"]
 
 groupings = {
     "status" : {
+        "id": "status",
         "columns": {
             "status-1": {
                 "id": "status-1",
@@ -89,6 +90,7 @@ groupings = {
         "columnOrder": ["status-1", "status-2", "status-3"]
     },
     "bucket" : {
+        "id": "bucket",
         "columns": {
             "bucket-1": {
                 "id": "bucket-1",
@@ -200,9 +202,20 @@ def edit_grouping(grouping_id):
 
         groupings[grouping_id] = data["grouping"]
 
-        return data["grouping"]
+        return data
     
     return {}
 
+@app.route('/api/groupings/<string:grouping_id>/columns/<string:column_id>', methods=('GET', 'PUT', 'DELETE'))
+def edit_column(grouping_id, column_id):
+    """
+    Get, edit, or delete grouping.
+    """
+    if request.method == 'PUT':
+        data = request.json
 
+        groupings[grouping_id]["columns"][column_id] = data["column"]
 
+        return data
+    
+    return {}

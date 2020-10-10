@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import './CardDialog.css';
 import ContentEditable from 'react-contenteditable';
 import { DialogOverlay, DialogContent } from '@reach/dialog';
-import { Container } from '../Card/Card';
 
 class CardDialog extends Component {
     constructor(props) {

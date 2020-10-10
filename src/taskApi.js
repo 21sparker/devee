@@ -51,5 +51,48 @@ const addTask = (task, columnId, callback) => {
     })
 }
 
+const editGrouping = (grouping, callback) => {
+    const groupingId = grouping.id;
+    fetch('/api/groupings/' + groupingId, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            grouping: grouping, 
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Success editing grouping ", grouping);
+        callback(data);
+    })
+    .catch(error => {
+        console.log("Error occurred trying to edit grouping " + groupingId);
+        console.log(error);
+    })
+}
 
-export { addTask, editTask };
+const editColumn = (column, groupingId, callback) => {
+    const columnId = column.id;
+    fetch('/api/groupings/' + groupingId + '/columns/' + columnId, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            column: column, 
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Success editing column ", columnId);
+        callback(data);
+    })
+    .catch(error => {
+        console.log("Error occurred trying to edit column " + columnId);
+        console.log(error);
+    })
+}
+
+export { addTask, editTask, editGrouping, editColumn };
