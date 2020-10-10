@@ -4,7 +4,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import "@reach/dialog/styles.css";
 import { ColumnWrapper } from '../Column/Column';
 import CardDialog from '../CardDialog/CardDialog';
-import { editTask, addTask, editGrouping, editColumn } from '../../taskApi';
+import { editTask, addTask, editGrouping, editColumn, editAndMoveTask } from '../../taskApi';
 
 // Dialog Library Documentation
 // https://reach.tech/dialog/#dialog-ondismiss
@@ -188,58 +188,97 @@ class KanbanBoard extends Component {
         const dueDateChanged = (changes.dueDate ? changes.dueDate.getTime() : null) !== (task.dueDate ? task.dueDate.getTime() : null)
         const statusChanged = changes.statusId !== statusId;
         if (descriptionChanged || dueDateChanged || statusChanged) {
-
-            // Callback to update the state once the api returns a successful task edit
-            const callback = data => {
-
-                // Update Card Dialog state variables and update task in state
-                const dataTask = data.task;
-                const newState = {
-                    ...this.state,
-                    currentDialog: null,
-                    cardDialogTask: null,
-                    proposedChanges: null,
-                    tasks: {
-                        ...this.state.tasks,
-                        [dataTask.id]: this.cleanTask(dataTask),
-                    }
-                }
-                
-                if (statusChanged) {
-                    // Remove task from previous status column
-                    const dataPrevStatusId = data.taskRelated.statusId.previous;
-                    const dataPrevStatusTaskIds = Array.from(this.state.columns[dataPrevStatusId].taskIds);
-                    dataPrevStatusTaskIds.splice(dataPrevStatusTaskIds.indexOf(dataTask.id), 1)
-                    
-                    // Add task to new status column
-                    const dataNextStatusId = data.taskRelated.statusId.next;
-                    const dataNextStatusTaskIds = this.state.columns[dataNextStatusId].taskIds.concat(dataTask.id);
-                    
-                    // Include changes in new state
-                    newState.columns = {
-                        ...this.state.columns,
-                        [dataPrevStatusId]: {
-                            ...this.state.columns[dataPrevStatusId],
-                            taskIds: dataPrevStatusTaskIds
-                        },
-                        [dataNextStatusId]: {
-                            ...this.state.columns[dataNextStatusId],
-                            taskIds: dataNextStatusTaskIds
-                        },
-                    }
-                }
-                this.setState(newState);
+            const newTask = {
+                ...task,
+                description: changes.description,
+                dueDate: changes.dueDate,
             }
 
-            editTask(
-                {
-                    ...task,
-                    description: changes.description,
-                    dueDate: changes.dueDate,
-                },
-                { 
-                    statusId: { previous: statusId, next: changes.statusId }
-                }, callback)
+            // Update status columns if the card has changed status
+            if (statusChanged) {
+                const grouping = this.state.groupings[this.state.currentGrouping];
+                const statusColumns = this.state.groupings[this.state.currentGrouping].columns;
+
+                // Update taskIds order for previous status column
+                const prevColumnTaskIds = Array.from(statusColumns[statusId].taskIds);
+                console.log(prevColumnTaskIds)
+                prevColumnTaskIds.splice(prevColumnTaskIds.indexOf(task.id), 1);
+                const previousStatusColumn = {
+                    ...statusColumns[statusId],
+                    taskIds: prevColumnTaskIds,
+                }
+                console.log(previousStatusColumn);
+
+                // Update taskIds order for next status column
+                const nextColumnTaskIds = Array.from(statusColumns[changes.statusId].taskIds);
+                console.log(nextColumnTaskIds)
+                nextColumnTaskIds.push(task.id);
+                const nextStatusColumn = {
+                    ...statusColumns[changes.statusId],
+                    taskIds: nextColumnTaskIds,
+                }
+                console.log(nextStatusColumn);
+
+                // Callback to update the state once the api returns a successful task edit and
+                // column change
+                const callback = data => {
+                    const dataTask = data[0].task;
+                    const prevColumn = data[1].column;
+                    const nextColumn = data[2].column;
+    
+                    // TODO: By the time this callback is called, the grouping might have changed,
+                    // so the column changes will fail if they have changed. Need to fix this to 
+                    // capture the grouping along with the column changes
+                    this.setState({
+                        // Hide card dialog
+                        currentDialog: null,
+                        cardDialogTask: null,
+                        proposedChanges: null,
+                        // Update task with changes                
+                        tasks: {
+                            ...this.state.tasks,
+                            [dataTask.id]: this.cleanTask(dataTask),
+                        },
+                        // Update columns
+                        groupings: {
+                            ...this.state.groupings,
+                            [grouping.id]: {
+                                ...grouping,
+                                columns: {
+                                    ...grouping.columns,
+                                    [prevColumn.id]: prevColumn,
+                                    [nextColumn.id]: nextColumn,
+                                }
+                            }
+    
+                        }
+                    });
+                }
+
+                editAndMoveTask(newTask, 
+                    grouping.id, 
+                    previousStatusColumn, 
+                    nextStatusColumn,
+                    callback)
+            } else {
+                // Callback to update the state once the api returns a successful task edit
+                const callback = data => {
+                    const dataTask = data.task;
+
+                    this.setState({
+                        // Hide card dialog
+                        currentDialog: null,
+                        cardDialogTask: null,
+                        proposedChanges: null,
+                        // Update task with changes                
+                        tasks: {
+                            ...this.state.tasks,
+                            [dataTask.id]: this.cleanTask(dataTask),
+                        }
+                    });
+                }                
+                editTask(task, callback)
+            }           
         } else {
             this.setState({
                 currentDialog: null,
@@ -270,6 +309,7 @@ class KanbanBoard extends Component {
     }
 
     render() {
+        console.log(this.state);
         
         let columnsList;
         if (this.state.groupings) {
@@ -289,6 +329,8 @@ class KanbanBoard extends Component {
         } else {
             columnsList = null
         }
+
+        console.log(columnsList);
 
         const dialog = () => {
             switch(this.state.currentDialog){

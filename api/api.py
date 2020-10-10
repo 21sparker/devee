@@ -167,9 +167,10 @@ def edit_item(task_id):
 
             # Status has changed for task
             if "statusId" in task_related:
+                status_columns = groupings["status"]["columns"]
                 statusId = task_related["statusId"]
-                previous_col = columns[statusId["previous"]]
-                next_col = columns[statusId["next"]]
+                previous_col = status_columns[statusId["previous"]]
+                next_col = status_columns[statusId["next"]]
                 previous_col["taskIds"].remove(task["id"])
                 next_col["taskIds"].append(task["id"])
 
