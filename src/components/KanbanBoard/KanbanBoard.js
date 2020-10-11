@@ -351,13 +351,13 @@ class KanbanBoard extends Component {
             <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable droppableId="all-columns" direction="horizontal" type="column">
                     {provided => (
-                        <KanbanStyleBoard
+                        <KanbanBoardContainer
                             {...provided.droppableProps}
                             innerRef={provided.innerRef}>
                             
                             {columnsList}
                             {provided.placeholder}
-                        </KanbanStyleBoard>
+                        </KanbanBoardContainer>
                     )}
                 </Droppable>
                 {dialog()}
@@ -369,7 +369,7 @@ class KanbanBoard extends Component {
 
 
 
-function KanbanStyleBoard(props) {
+function KanbanBoardContainer(props) {
     const { innerRef, children, ...rest } = props;
 
     return (
