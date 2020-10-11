@@ -26,13 +26,13 @@ tasks = {
     },
     "task-3": {
         "id": "task-3",
-        "description": "Drop a poop",
+        "description": "Make some breakfast",
         "dueDate": datetime.now(),
         "createdDate": datetime.now()
     },
     "task-4": {
         "id": "task-4",
-        "description": "Drop another poop",
+        "description": "Go to the store",
         "dueDate": None,
         "createdDate": datetime.now()
     },
@@ -119,6 +119,7 @@ def get_all_tasks():
         data = request.json
         task = data["task"]
         columnId = data["columnId"]
+        groupingId = data["groupingId"]
 
         # MOCK ONLY
         task["createdDate"] = datetime.now()
@@ -131,8 +132,7 @@ def get_all_tasks():
             task["dueDate"] = None
 
         tasks[task["id"]] = task
-        columns[columnId]["taskIds"].append(task["id"])
-
+        groupings[groupingId]["columns"][columnId]["taskIds"].insert(0, task["id"])
 
         # TODO: Add to database
 

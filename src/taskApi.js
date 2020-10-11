@@ -2,6 +2,7 @@
 
 const editTask = (task, callback) => {
     const taskId = task.id;
+    console.log(task)
     fetch('api/tasks/' + taskId, {
         method: 'PUT',
         headers: {
@@ -57,7 +58,8 @@ const editAndMoveTask = (task, groupingId, prevColumn, nextColumn, callback) => 
     })
 }
 
-const addTask = (task, columnId, callback) => {
+const addTask = (task, columnId, groupingId, callback) => {
+    console.log(task, columnId, groupingId)
     fetch('/api/tasks', {
         method: 'POST',
         headers: {
@@ -65,16 +67,17 @@ const addTask = (task, columnId, callback) => {
         },
         body: JSON.stringify({
             task: task,
+            groupingId: groupingId,
             columnId: columnId,
         }),
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Success: ', data);
+        console.log('Success adding task: ', data);
         callback(data);
     })
     .catch(error => {
-        console.log('Error: ', error);
+        console.log('Error adding task: ', error);
     })
 }
 

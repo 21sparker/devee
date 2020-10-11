@@ -183,6 +183,7 @@ class KanbanBoard extends Component {
     closeCardDialog = (changes) => {
         const task = this.state.cardDialogTask;
         const statusId = this.state.cardDialogStatusId;
+
         // Update task in DB if task was changed
         const descriptionChanged = changes.description !== task.description;
         const dueDateChanged = (changes.dueDate ? changes.dueDate.getTime() : null) !== (task.dueDate ? task.dueDate.getTime() : null)
@@ -201,23 +202,19 @@ class KanbanBoard extends Component {
 
                 // Update taskIds order for previous status column
                 const prevColumnTaskIds = Array.from(statusColumns[statusId].taskIds);
-                console.log(prevColumnTaskIds)
                 prevColumnTaskIds.splice(prevColumnTaskIds.indexOf(task.id), 1);
                 const previousStatusColumn = {
                     ...statusColumns[statusId],
                     taskIds: prevColumnTaskIds,
                 }
-                console.log(previousStatusColumn);
 
                 // Update taskIds order for next status column
                 const nextColumnTaskIds = Array.from(statusColumns[changes.statusId].taskIds);
-                console.log(nextColumnTaskIds)
                 nextColumnTaskIds.push(task.id);
                 const nextStatusColumn = {
                     ...statusColumns[changes.statusId],
                     taskIds: nextColumnTaskIds,
                 }
-                console.log(nextStatusColumn);
 
                 // Callback to update the state once the api returns a successful task edit and
                 // column change
@@ -277,7 +274,7 @@ class KanbanBoard extends Component {
                         }
                     });
                 }                
-                editTask(task, callback)
+                editTask(newTask, callback)
             }           
         } else {
             this.setState({
@@ -289,6 +286,7 @@ class KanbanBoard extends Component {
     }
 
     addNewTask = (task, columnId) => {
+        const grouping = this.state.groupings[this.state.currentGrouping];
         const callback = data => {
 
             this.setState({
@@ -296,21 +294,25 @@ class KanbanBoard extends Component {
                     ...this.state.tasks,
                     [data.id]: this.cleanTask(data),
                 },
-                columns: {
-                    ...this.state.columns,
-                    [columnId]: {
-                        ...this.state.columns[columnId],
-                        taskIds: [data.id].concat(this.state.columns[columnId].taskIds),
+                groupings: {
+                    ...this.state.groupings,
+                    [grouping.id]: {
+                        ...grouping,
+                        columns: {
+                            ...grouping.columns,
+                            [columnId]: {
+                                ...grouping.columns[columnId],
+                                taskIds: [data.id].concat(grouping.columns[columnId].taskIds),
+                            }
+                        }
                     }
                 }
             })
         }
-        addTask(task, columnId, callback);
+        addTask(task, columnId, grouping.id, callback);
     }
 
-    render() {
-        console.log(this.state);
-        
+    render() {        
         let columnsList;
         if (this.state.groupings) {
             const currentGroup = this.state.groupings[this.state.currentGrouping];
@@ -329,8 +331,6 @@ class KanbanBoard extends Component {
         } else {
             columnsList = null
         }
-
-        console.log(columnsList);
 
         const dialog = () => {
             switch(this.state.currentDialog){
