@@ -7,4 +7,7 @@ div[contenteditable] {
     outline: 0px solid transparent;
 }
 
-
+.app-container {
+    display: flex;
+    flex-direction: column;
+}
