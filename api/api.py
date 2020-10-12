@@ -14,31 +14,31 @@ app = Flask(__name__)
 tasks = {
     "task-1": {
         "id": "task-1",
-        "description": "Watch a movie",
+        "description": "Feature: User can switch between different projects/boards.",
         "dueDate": datetime.now(),
         "createdDate": datetime.now(),
     },
     "task-2": {
         "id": "task-2",
-        "description": "Dance in the rain",
+        "description": "Feature: User can add additional columns.",
         "dueDate": datetime.now(),
         "createdDate": datetime.now()
     },
     "task-3": {
         "id": "task-3",
-        "description": "Make some breakfast",
+        "description": "Fix: New cards are being added to end of column. They should be added to the beginning.",
         "dueDate": datetime.now(),
         "createdDate": datetime.now()
     },
     "task-4": {
         "id": "task-4",
-        "description": "Go to the store",
+        "description": "Feature: Add 'Start Date' field to tasks.",
         "dueDate": None,
         "createdDate": datetime.now()
     },
     "task-5": {
         "id": "task-5",
-        "description": None,
+        "description": "Fix: 'Due Date' value of task moved one day back when edit dialog is closed.",
         "dueDate": None,
         "createdDate": datetime.now()
     }     

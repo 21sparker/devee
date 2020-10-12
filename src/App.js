@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './App.css'
+import './App.css';
 import KanbanBoard from './components/KanbanBoard/KanbanBoard';
 import Navbar from './components/Navbar/Navbar';
 
