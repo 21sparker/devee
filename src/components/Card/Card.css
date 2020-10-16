@@ -1,6 +1,6 @@
 .card {
     /* Add shadows to create the "card" effect */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
     border-radius: 4px;
     background-color: white;
     margin-bottom: 8px;
@@ -10,7 +10,7 @@
 
 .card:hover {
     /* On mouse-over, add a deeper shadow */
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 }
 
 .card-title {

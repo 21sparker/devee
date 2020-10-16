@@ -1,3 +1,4 @@
 .kanban-style-board {
     display: flex;
+    padding-top: 1rem;
 }
