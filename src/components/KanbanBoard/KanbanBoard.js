@@ -28,6 +28,12 @@ class KanbanBoard extends Component {
         this.renderMyData();
     }
 
+    /**
+     * "Cleans" a task object by changing properties to their appropriate types
+     * and adds any additional values needed by the general application.
+     * 
+     * @param {Task obj} task 
+     */
     cleanTask = task => {
         task["dueDate"] = task["dueDate"] ? new Date(task["dueDate"]) : null;
         task["createdDate"] = task["createdDate"] ? new Date(task["createdDate"]) : null;
@@ -36,6 +42,12 @@ class KanbanBoard extends Component {
         return task;
     }
 
+    /**
+     * Fetches all the data needed to build the Kanban Board.
+     * Fetches all: 
+     *      1. Tasks
+     *      2. Groupings
+     */
     renderMyData() {
         Promise.all([
             fetch('/api/tasks'),
@@ -168,6 +180,13 @@ class KanbanBoard extends Component {
         });
     }
 
+    /**
+     * Opens the Card Dialog and assigns the passed in task as the task to display 
+     * in the Card Dialog.
+     * 
+     * @param {string} taskId 
+     * @param {string} colId 
+     */
     openCardDialog = (taskId, colId) => {
         const columns = this.state.groupings[this.state.currentGrouping]["columns"]
         this.setState({ 
@@ -180,6 +199,18 @@ class KanbanBoard extends Component {
         })
     }
 
+
+    /**
+     * Does a comparison between the state of the task object in the card dialog before opening
+     * and after closing. If a change has been made, propagate that change to the API via the 
+     * editTask or editAndMoveTask functions (depending on whether the change also results in a column
+     * switch).
+     * 
+     * The changes object will have key-values for properties that were available for change in the 
+     * Card Dialog representing the values when the Card Dialog was closed.
+     * 
+     * @param {obj} changes 
+     */
     closeCardDialog = (changes) => {
         const task = this.state.cardDialogTask;
         const statusId = this.state.cardDialogStatusId;
@@ -285,6 +316,13 @@ class KanbanBoard extends Component {
         }
     }
 
+    /**
+     * Updates the state to reflect the newly added task then calls the 
+     * addTask function to propagate change to API.
+     * 
+     * @param {Task obj} task 
+     * @param {string} columnId 
+     */
     addNewTask = (task, columnId) => {
         const grouping = this.state.groupings[this.state.currentGrouping];
         const callback = data => {
@@ -312,7 +350,8 @@ class KanbanBoard extends Component {
         addTask(task, columnId, grouping.id, callback);
     }
 
-    render() {        
+    render() {
+        // Generate all the column elements relevant for the current grouping
         let columnsList;
         if (this.state.groupings) {
             const currentGroup = this.state.groupings[this.state.currentGrouping];
@@ -332,6 +371,8 @@ class KanbanBoard extends Component {
             columnsList = null
         }
 
+        // Function to display the dialog to be open as indicated by the state.
+        // Default is no dialog.
         const dialog = () => {
             switch(this.state.currentDialog){
                 case "EDIT_TASK":
